@@ -333,6 +333,10 @@ export class Telli implements INodeType {
 						const lastName = this.getNodeParameter('lastName', i) as string;
 						const phoneNumber = this.getNodeParameter('phoneNumber', i) as string;
 						const externalContactId = this.getNodeParameter('externalContactId', i) as string;
+						const email = this.getNodeParameter('email', i, '') as string;
+						const contactDetailsCollection = this.getNodeParameter('contactDetails', i, { details: [] }) as IDataObject;
+						const timezone = this.getNodeParameter('timezone', i, '') as string;
+						const salutation = this.getNodeParameter('salutation', i, '') as string;
 						
 						if (!phoneNumber.match(/^\+[1-9]\d{1,14}$/)) {
 							throw new NodeOperationError(
@@ -341,13 +345,6 @@ export class Telli implements INodeType {
 								{ itemIndex: i }
 							);
 						}
-						
-						// optional parameters
-						const email = this.getNodeParameter('email', i, '') as string;
-						const contactDetailsCollection = this.getNodeParameter('contactDetails', i, { details: [] }) as IDataObject;
-						const timezone = this.getNodeParameter('timezone', i, '') as string;
-						const salutation = this.getNodeParameter('salutation', i, '') as string;
-	
 						
 						const contactDetailsObj: IDataObject = {};
 						if (contactDetailsCollection && contactDetailsCollection.details) {
@@ -404,7 +401,6 @@ export class Telli implements INodeType {
 							if (details.message) {
 								message = details.message as string;
 								
-								// Validate message length
 								if (message.length > MAX_TEXT_FIELD_LENGTH) {
 									throw new NodeOperationError(
 										this.getNode(),
@@ -419,8 +415,8 @@ export class Telli implements INodeType {
 								for (const questionItem of questionsList) {
 									// Validate question field lengths
 									const neededInfo = questionItem.neededInformation as string;
-									const exampleQ = questionItem.exampleQuestion as string;
-									const respFormat = questionItem.responseFormat as string;
+									const exampleQuestion = questionItem.exampleQuestion as string;
+									const responseFormat = questionItem.responseFormat as string;
 									
 									if (neededInfo && neededInfo.length > MAX_TEXT_FIELD_LENGTH) {
 										throw new NodeOperationError(
@@ -430,18 +426,18 @@ export class Telli implements INodeType {
 										);
 									}
 									
-									if (exampleQ && exampleQ.length > MAX_TEXT_FIELD_LENGTH) {
+									if (exampleQuestion && exampleQuestion.length > MAX_TEXT_FIELD_LENGTH) {
 										throw new NodeOperationError(
 											this.getNode(),
-											`Example Question is too long (${exampleQ.length} chars). Maximum allowed is ${MAX_TEXT_FIELD_LENGTH} characters.`,
+											`Example Question is too long (${exampleQuestion.length} chars). Maximum allowed is ${MAX_TEXT_FIELD_LENGTH} characters.`,
 											{ itemIndex: i }
 										);
 									}
 									
-									if (respFormat && respFormat.length > MAX_TEXT_FIELD_LENGTH) {
+									if (responseFormat && responseFormat.length > MAX_TEXT_FIELD_LENGTH) {
 										throw new NodeOperationError(
 											this.getNode(),
-											`Response Format is too long (${respFormat.length} chars). Maximum allowed is ${MAX_TEXT_FIELD_LENGTH} characters.`,
+											`Response Format is too long (${responseFormat.length} chars). Maximum allowed is ${MAX_TEXT_FIELD_LENGTH} characters.`,
 											{ itemIndex: i }
 										);
 									}
@@ -458,14 +454,20 @@ export class Telli implements INodeType {
 
 						const callData: IDataObject = {
 							contact_id: contactId,
-							agent_id: agentId || undefined,
-							max_retry_days: maxRetryDays,
-							call_details: {
-								message: message || undefined,
-								questions: questions.length ? questions : undefined,
-							},
-							override_from_number: overrideFromNumber || undefined,
 						};
+						
+						// optional fields
+						if (agentId) callData.agent_id = agentId;
+						if (maxRetryDays !== undefined) callData.max_retry_days = maxRetryDays;
+						if (overrideFromNumber) callData.override_from_number = overrideFromNumber;
+						
+						const callDetailsObj: IDataObject = {};
+						if (message) callDetailsObj.message = message;
+						if (questions.length > 0) callDetailsObj.questions = questions;
+						
+						if (Object.keys(callDetailsObj).length > 0) {
+							callData.call_details = callDetailsObj;
+						}
 
 						const callResponse = await this.helpers.httpRequestWithAuthentication.call(
 							this,
