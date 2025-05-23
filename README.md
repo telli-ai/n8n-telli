@@ -147,7 +147,3 @@ If you don't see your changes after rebuilding and restarting n8n:
 2. Verify that the files were correctly copied to the custom directory
 3. Make sure n8n was properly restarted
 4. Clear your browser cache or open n8n in an incognito window
-
-## License
-
-[MIT](LICENSE.md)
