@@ -8,6 +8,9 @@ import {
 	IDataObject,
 } from 'n8n-workflow';
 
+const BASE_API_URL = 'https://api.telli.com/v1';
+const MAX_TEXT_FIELD_LENGTH = 500;
+
 export class Telli implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'telli',
@@ -321,20 +324,30 @@ export class Telli implements INodeType {
 		const items = this.getInputData();
 		const outputData: INodeExecutionData[] = [];
 		const operation = this.getNodeParameter('operation', 0) as string;
-		const baseApiUrl = 'https://api.telli.com/v1';
 
 		for (let i = 0; i < items.length; i++) {
 			try {
 				switch (operation) {
 					case 'add-telli-contact':
-						const firstName = this.getNodeParameter('firstName', i);
+						const firstName = this.getNodeParameter('firstName', i) as string;
 						const lastName = this.getNodeParameter('lastName', i) as string;
-						const email = this.getNodeParameter('email', i) as string;
 						const phoneNumber = this.getNodeParameter('phoneNumber', i) as string;
 						const externalContactId = this.getNodeParameter('externalContactId', i) as string;
-						const salutation = this.getNodeParameter('salutation', i) as string;
-						const timezone = this.getNodeParameter('timezone', i) as string;
-						const contactDetailsCollection = this.getNodeParameter('contactDetails', i) as IDataObject;
+						
+						if (!phoneNumber.match(/^\+[1-9]\d{1,14}$/)) {
+							throw new NodeOperationError(
+								this.getNode(), 
+								`Invalid phone number format. Please use E.164 format (e.g., +12125551234)`,
+								{ itemIndex: i }
+							);
+						}
+						
+						// optional parameters
+						const email = this.getNodeParameter('email', i, '') as string;
+						const contactDetailsCollection = this.getNodeParameter('contactDetails', i, { details: [] }) as IDataObject;
+						const timezone = this.getNodeParameter('timezone', i, '') as string;
+						const salutation = this.getNodeParameter('salutation', i, '') as string;
+	
 						
 						const contactDetailsObj: IDataObject = {};
 						if (contactDetailsCollection && contactDetailsCollection.details) {
@@ -344,23 +357,25 @@ export class Telli implements INodeType {
 							}
 						}
 
-						const contactData = {
+						const contactData: IDataObject = {
 							first_name: firstName,
 							last_name: lastName,
-							email,
 							phone_number: phoneNumber,
-							external_contact_id: externalContactId || undefined,
-							salutation: salutation || undefined,
-							timezone: timezone || undefined,
-							contact_details: Object.keys(contactDetailsObj).length ? contactDetailsObj : undefined,
+							external_contact_id: externalContactId,
 						};
+	
+						if (email) contactData.email = email;
+						if (salutation) contactData.salutation = salutation;
+						if (timezone) contactData.timezone = timezone;
+						if (Object.keys(contactDetailsObj).length > 0) contactData.contact_details = contactDetailsObj;
+	
 
 						const contactResponse = await this.helpers.httpRequestWithAuthentication.call(
 							this,
 							'telliApi',
 							{
 								method: 'POST',
-								url: `${baseApiUrl}/add-contact`,
+								url: `${BASE_API_URL}/add-contact`,
 								headers: {
 									'Content-Type': 'application/json',
 								},
@@ -388,11 +403,49 @@ export class Telli implements INodeType {
 							
 							if (details.message) {
 								message = details.message as string;
+								
+								// Validate message length
+								if (message.length > MAX_TEXT_FIELD_LENGTH) {
+									throw new NodeOperationError(
+										this.getNode(),
+										`Message is too long (${message.length} chars). Maximum allowed is ${MAX_TEXT_FIELD_LENGTH} characters.`,
+										{ itemIndex: i }
+									);
+								}
 							}
 							
 							if (details.questions && (details.questions as IDataObject).questionList) {
 								const questionsList = ((details.questions as IDataObject).questionList as IDataObject[]);
 								for (const questionItem of questionsList) {
+									// Validate question field lengths
+									const neededInfo = questionItem.neededInformation as string;
+									const exampleQ = questionItem.exampleQuestion as string;
+									const respFormat = questionItem.responseFormat as string;
+									
+									if (neededInfo && neededInfo.length > MAX_TEXT_FIELD_LENGTH) {
+										throw new NodeOperationError(
+											this.getNode(),
+											`Needed Information is too long (${neededInfo.length} chars). Maximum allowed is ${MAX_TEXT_FIELD_LENGTH} characters.`,
+											{ itemIndex: i }
+										);
+									}
+									
+									if (exampleQ && exampleQ.length > MAX_TEXT_FIELD_LENGTH) {
+										throw new NodeOperationError(
+											this.getNode(),
+											`Example Question is too long (${exampleQ.length} chars). Maximum allowed is ${MAX_TEXT_FIELD_LENGTH} characters.`,
+											{ itemIndex: i }
+										);
+									}
+									
+									if (respFormat && respFormat.length > MAX_TEXT_FIELD_LENGTH) {
+										throw new NodeOperationError(
+											this.getNode(),
+											`Response Format is too long (${respFormat.length} chars). Maximum allowed is ${MAX_TEXT_FIELD_LENGTH} characters.`,
+											{ itemIndex: i }
+										);
+									}
+									
 									questions.push({
 										fieldName: questionItem.fieldName,
 										neededInformation: questionItem.neededInformation,
@@ -419,7 +472,7 @@ export class Telli implements INodeType {
 							'telliApi',
 							{
 								method: 'POST',
-								url: `${baseApiUrl}/schedule-call`,
+								url: `${BASE_API_URL}/schedule-call`,
 								headers: {
 									'Content-Type': 'application/json',
 								},
@@ -436,10 +489,24 @@ export class Telli implements INodeType {
 						throw new NodeOperationError(this.getNode(), `The operation "${operation}" is not supported!`);
 				}
 			} catch (error) {
+				if (error.response) {
+					const errorData = error.response.data || {};
+					const statusCode = error.response.status;
+					const errorMessage = errorData.message || error.message || 'Unknown API error';
+					
+					throw new NodeOperationError(
+						this.getNode(),
+						`API error (${statusCode}): ${errorMessage}`,
+						{ itemIndex: i, description: `Operation: ${operation}` }
+					);
+				}
+				
 				if (this.continueOnFail()) {
 					outputData.push({
 						json: {
 							error: error.message,
+							operation,
+							itemIndex: i,
 						},
 					});
 					continue;
