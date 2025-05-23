@@ -7,7 +7,7 @@ telli is an AI phone calling platform that lets you automate phone call operatio
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
 [Installation](#installation)  
-[Operations](#operations)  
+[Actions](#actions)  
 [Credentials](#credentials)  
 [Compatibility](#compatibility)  
 [Usage](#usage)  
@@ -60,7 +60,7 @@ npm install n8n-nodes-telli
 6. Install the dependency: `cd ~/.n8n/custom && npm install`
 7. Restart n8n
 
-## Operations
+## Actions
 
 The telli node provides the following operations:
 
