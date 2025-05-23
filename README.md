@@ -6,13 +6,13 @@ telli is an AI phone calling platform that lets you automate phone call operatio
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
-[Installation](#installation)  
-[Actions](#actions)  
-[Credentials](#credentials)  
-[Compatibility](#compatibility)  
-[Usage](#usage)  
-[Resources](#resources)  
-[Development](#development)  
+- [Installation](#installation)  
+- [Actions](#actions)  
+- [Credentials](#credentials)  
+- [Compatibility](#compatibility)  
+- [Usage](#usage)  
+- [Resources](#resources)  
+- [Development](#development)  
 
 ## Repository Structure
 
