@@ -1,0 +1,35 @@
+# Dependencies
+node_modules
+
+# Build outputs
+dist
+*.tsbuildinfo
+
+# OS files
+.DS_Store
+
+# Temporary files
+.tmp
+tmp
+npm-debug.log*
+
+# Package manager files
+yarn.lock
+package-lock.json
+
+# Environment files
+.env
+.env.*
+
+# IDE and editor files
+.vscode/launch.jsonc
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.sublime-*
+*.swp
+*.swo
+
+# Mise configuration
+mise.toml
