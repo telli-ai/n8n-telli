@@ -1,15 +1,15 @@
 {
   "name": "n8n-nodes-telli",
   "version": "0.1.0",
-  "description": "",
+  "description": "n8n community node which lets you use the telli AI phone calling platform in your n8n workflows",
   "keywords": [
     "n8n-community-node-package"
   ],
   "license": "MIT",
-  "homepage": "",
+  "homepage": "https://telli.com/",
   "author": {
-    "name": "",
-    "email": ""
+    "name": "Paulo Ramirez",
+    "email": "paulo@telli.com"
   },
   "repository": {
     "type": "git",
@@ -25,10 +25,21 @@
     "format": "prettier nodes credentials --write",
     "lint": "eslint nodes credentials package.json",
     "lintfix": "eslint nodes credentials package.json --fix",
-    "prepublishOnly": "npm build && npm lint -c .eslintrc.prepublish.js nodes credentials package.json"
+    "prepublishOnly": "npm build && npm lint -c .eslintrc.prepublish.js nodes credentials package.json",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "files": [
-    "dist"
+    "dist/**/*",
+    "!dist/**/*.spec.js",
+    "!dist/**/*.test.js", 
+    "!dist/**/*.spec.d.ts",
+    "!dist/**/*.test.d.ts",
+    "!dist/tests/",
+    "!dist/__tests__/",
+    "!dist/tmp/",
+    "!dist/tsconfig.tsbuildinfo"
   ],
   "n8n": {
     "n8nNodesApiVersion": 1,
@@ -40,11 +51,15 @@
     ]
   },
   "devDependencies": {
+    "@types/jest": "^29.5.5",
     "@typescript-eslint/parser": "~8.32.0",
     "eslint": "^8.57.0",
     "eslint-plugin-n8n-nodes-base": "^1.16.3",
     "gulp": "^5.0.0",
+    "jest": "^29.7.0",
+    "nock": "^13.4.0",
     "prettier": "^3.5.3",
+    "ts-jest": "^29.1.1",
     "typescript": "^5.8.2"
   },
   "peerDependencies": {
