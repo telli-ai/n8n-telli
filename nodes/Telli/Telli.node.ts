@@ -9,7 +9,6 @@ import {
 } from 'n8n-workflow';
 
 const BASE_API_URL = 'https://api.telli.com/v1';
-const MAX_TEXT_FIELD_LENGTH = 500;
 
 export class Telli implements INodeType {
 	description: INodeTypeDescription = {
@@ -211,6 +210,7 @@ export class Telli implements INodeType {
 						operation: ['schedule-telli-call'],
 					},
 				},
+				required: true,
 				description: 'Optional agent ID to use for the call. If not set, the default agent will be used',
 			},
 			{
@@ -236,87 +236,7 @@ export class Telli implements INodeType {
 					},
 				},
 				description: 'Override the from number for the call',
-			},
-			{
-				displayName: 'Call Details',
-				name: 'callDetails',
-				placeholder: 'Call Details',
-				type: 'fixedCollection',
-				typeOptions: {
-					multipleValues: false,
-				},
-				default: {},
-				displayOptions: {
-					show: {
-						operation: ['schedule-telli-call'],
-					},
-				},
-				options: [
-					{
-						name: 'details',
-						displayName: 'Call Details',
-						values: [
-							{
-								displayName: 'Message',
-								name: 'message',
-								type: 'string',
-								typeOptions: {
-									rows: 4,
-								},
-								default: '',
-								description: 'The message the AI agent should deliver to the customer. Max 500 characters.',
-							},
-							{
-								displayName: 'Questions',
-								name: 'questions',
-								placeholder: 'Add Question',
-								type: 'fixedCollection',
-								typeOptions: {
-									multipleValues: true,
-								},
-                                description: 'A set of questions the AI agent should ask the customer',
-								default: {},
-								options: [
-									{
-										name: 'questionList',
-										displayName: 'Question',
-										values: [
-											{
-												displayName: 'Field Name',
-												name: 'fieldName',
-												type: 'string',
-												default: '',
-												description: 'use lowercase snake_case. The answer will be in the Call Analysis object under answer_<fieldName>',
-											},
-											{
-												displayName: 'Needed Information',
-												name: 'neededInformation',
-												type: 'string',
-												default: '',
-												description: 'What information is needed. Max 500 characters.',
-											},
-											{
-												displayName: 'Example Question',
-												name: 'exampleQuestion',
-												type: 'string',
-												default: '',
-												description: 'An example question that the AI agent should ask the customer. Max 500 characters.',
-											},
-											{
-												displayName: 'Response Format',
-												name: 'responseFormat',
-												type: 'string',
-												default: '',
-												description: 'The expected format of the answer. Could be a string, date, yes/no, etc. Max 500 characters.',
-											},
-										],
-									},
-								],
-							},
-						],
-					},
-				],
-			},
+			}
 		],
 	};
 
@@ -390,68 +310,7 @@ export class Telli implements INodeType {
 						const agentId = this.getNodeParameter('agentId', i) as string;
 						const maxRetryDays = this.getNodeParameter('maxRetryDays', i) as number;
 						const overrideFromNumber = this.getNodeParameter('overrideFromNumber', i) as string;
-						const callDetailsCollection = this.getNodeParameter('callDetails', i) as IDataObject;
 						
-						let message = '';
-						const questions = [];
-						
-						if (callDetailsCollection && callDetailsCollection.details) {
-							const details = callDetailsCollection.details as IDataObject;
-							
-							if (details.message) {
-								message = details.message as string;
-								
-								if (message.length > MAX_TEXT_FIELD_LENGTH) {
-									throw new NodeOperationError(
-										this.getNode(),
-										`Message is too long (${message.length} chars). Maximum allowed is ${MAX_TEXT_FIELD_LENGTH} characters.`,
-										{ itemIndex: i }
-									);
-								}
-							}
-							
-							if (details.questions && (details.questions as IDataObject).questionList) {
-								const questionsList = ((details.questions as IDataObject).questionList as IDataObject[]);
-								for (const questionItem of questionsList) {
-									// Validate question field lengths
-									const neededInfo = questionItem.neededInformation as string;
-									const exampleQuestion = questionItem.exampleQuestion as string;
-									const responseFormat = questionItem.responseFormat as string;
-									
-									if (neededInfo && neededInfo.length > MAX_TEXT_FIELD_LENGTH) {
-										throw new NodeOperationError(
-											this.getNode(),
-											`Needed Information is too long (${neededInfo.length} chars). Maximum allowed is ${MAX_TEXT_FIELD_LENGTH} characters.`,
-											{ itemIndex: i }
-										);
-									}
-									
-									if (exampleQuestion && exampleQuestion.length > MAX_TEXT_FIELD_LENGTH) {
-										throw new NodeOperationError(
-											this.getNode(),
-											`Example Question is too long (${exampleQuestion.length} chars). Maximum allowed is ${MAX_TEXT_FIELD_LENGTH} characters.`,
-											{ itemIndex: i }
-										);
-									}
-									
-									if (responseFormat && responseFormat.length > MAX_TEXT_FIELD_LENGTH) {
-										throw new NodeOperationError(
-											this.getNode(),
-											`Response Format is too long (${responseFormat.length} chars). Maximum allowed is ${MAX_TEXT_FIELD_LENGTH} characters.`,
-											{ itemIndex: i }
-										);
-									}
-									
-									questions.push({
-										fieldName: questionItem.fieldName,
-										neededInformation: questionItem.neededInformation,
-										exampleQuestion: questionItem.exampleQuestion,
-										responseFormat: questionItem.responseFormat,
-									});
-								}
-							}
-						}
-
 						const callData: IDataObject = {
 							contact_id: contactId,
 						};
@@ -460,14 +319,6 @@ export class Telli implements INodeType {
 						if (agentId) callData.agent_id = agentId;
 						if (maxRetryDays !== undefined) callData.max_retry_days = maxRetryDays;
 						if (overrideFromNumber) callData.override_from_number = overrideFromNumber;
-						
-						const callDetailsObj: IDataObject = {};
-						if (message) callDetailsObj.message = message;
-						if (questions.length > 0) callDetailsObj.questions = questions;
-						
-						if (Object.keys(callDetailsObj).length > 0) {
-							callData.call_details = callDetailsObj;
-						}
 
 						const callResponse = await this.helpers.httpRequestWithAuthentication.call(
 							this,
