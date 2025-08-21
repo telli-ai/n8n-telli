@@ -12,7 +12,7 @@ const BASE_API_URL = 'https://api.telli.com/v1';
 
 export class Telli implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'telli',
+		displayName: 'Telli',
 		name: 'telli',
 		icon: 'file:telli.svg',
 		group: ['transform'],
@@ -20,7 +20,7 @@ export class Telli implements INodeType {
 		subtitle: '={{$parameter["operation"]}}',
 		description: 'Interact with the telli API',
 		defaults: {
-			name: 'telli',
+			name: 'Telli',
 		},
 		inputs: [NodeConnectionType.Main],
 		outputs: [NodeConnectionType.Main],
