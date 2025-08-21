@@ -16,6 +16,9 @@ export class TelliApi implements ICredentialType {
 			type: 'string',
 			default: '',
 			required: true,
+			typeOptions: {
+				password: true,
+			},
 		}
 	];
 
