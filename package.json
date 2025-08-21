@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-telli",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "n8n community node which lets you use the telli AI phone calling platform in your n8n workflows",
   "keywords": [
     "n8n-community-node-package"
@@ -33,7 +33,7 @@
   "files": [
     "dist/**/*",
     "!dist/**/*.spec.js",
-    "!dist/**/*.test.js", 
+    "!dist/**/*.test.js",
     "!dist/**/*.spec.d.ts",
     "!dist/**/*.test.d.ts",
     "!dist/tests/",
