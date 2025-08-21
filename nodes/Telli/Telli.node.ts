@@ -132,7 +132,7 @@ export class Telli implements INodeType {
 						operation: ['add-telli-contact'],
 					},
 				},
-				description: 'Formal title or greeting (e.g. "Mr.", "Ms.", "Herr", "Frau"). If empty, will auto guess based on first name for German calls',
+				description: 'Formal title or greeting (e.g. "Mr.", "Ms.", "Herr", "Frau"). If empty, will auto guess based on first name for German calls.',
 			},
 			{
 				displayName: 'Timezone',
@@ -144,7 +144,7 @@ export class Telli implements INodeType {
 						operation: ['add-telli-contact'],
 					},
 				},
-				description: 'IANA timezone identifier (e.g. Europe/Berlin). Defaults to account timezone if not set',
+				description: 'IANA timezone identifier (e.g. Europe/Berlin). Defaults to account timezone if not set.',
 			},
 			{
 				displayName: 'Contact Details',
@@ -159,7 +159,7 @@ export class Telli implements INodeType {
 						operation: ['add-telli-contact'],
 					},
 				},
-                description: 'Custom variables passed to the AI agent (should be discussed in advance). Please send variables in lowercase snake_case. This used to be called dynamic_variables, which still works but is deprecated and should be replaced with contact_details. Alternatively, you can send contact_details_<key> in the body instead of an object.',
+                description: 'Custom variables passed to the AI agent (should be discussed in advance). Please send variables in lowercase snake_case. This used to be called dynamic_variables, which still works but is deprecated and should be replaced with contact_details. Alternatively, you can send contact_details_&lt;key&gt; in the body instead of an object.',
 				default: {},
 				options: [
 					{
@@ -211,7 +211,7 @@ export class Telli implements INodeType {
 					},
 				},
 				required: true,
-				description: 'Optional agent ID to use for the call. If not set, the default agent will be used',
+				description: 'Optional agent ID to use for the call. If not set, the default agent will be used.',
 			},
 			{
 				displayName: 'Max Retry Days',
@@ -223,7 +223,7 @@ export class Telli implements INodeType {
 						operation: ['schedule-telli-call'],
 					},
 				},
-				description: 'Optional number of days to retry the call. Defaults to the account\'s max retry days',
+				description: 'Optional number of days to retry the call. Defaults to the account\'s max retry days.',
 			},
 			{
 				displayName: 'Override From Number',

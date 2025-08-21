@@ -7,7 +7,7 @@ import {
 
 export class TelliApi implements ICredentialType {
 	name = 'telliApi';
-	displayName = 'telli API';
+	displayName = 'Telli API';
 	documentationUrl = 'https://docs.telli.com/api';
 	properties: INodeProperties[] = [
 		{
