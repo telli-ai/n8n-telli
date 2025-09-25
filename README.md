@@ -68,6 +68,21 @@ The telli node provides the following operations:
 - Add a new contact to telli with first name, last name, email, phone number, and optional attributes
 - See more info [here](https://docs.telli.com/endpoint/add-contact)
 
+### Update Contact
+- Update an existing contact in telli. Only provided fields will be updated, others remain unchanged
+- Supports updating first name, last name, phone number, email, external contact ID, external URL, salutation, timezone, and contact details
+- See more info [here](https://docs.telli.com/endpoint/update-contact)
+
+### Delete Contact
+- Permanently delete a contact and any PII data associated with it from the system
+- This action cannot be undone. If you want to stop calling a contact, use the `v1/remove-from-auto-dialer` endpoint instead
+- See more info [here](https://docs.telli.com/endpoint/delete-contact)
+
+### Remove from Auto Dialer
+- Remove a contact from the auto dialer queue
+- This stops the contact from receiving automated calls without deleting their data
+- See more info [here](https://docs.telli.com/endpoint/remove-from-auto-dialer)
+
 ### Schedule Call
 - Schedule an AI phone call with a telli contact, with customizable message and questions
 - See more info [here](https://docs.telli.com/endpoint/schedule-call)
@@ -94,6 +109,30 @@ This node has been tested with n8n version 0.171.0 and higher.
 3. Fill in the required fields (First Name, Last Name, Phone Number, External Contact ID)
 4. Optionally add Email, Salutation, etc.
 5. Connect the node to a trigger or another node
+
+### Update Contact Example
+
+1. Add the telli node to your workflow
+2. Select the "Update Contact" operation
+3. Enter the Contact ID (obtained from a previous Add Contact operation or from telli dashboard)
+4. Fill in only the fields you want to update (leave others empty to keep existing values)
+5. Connect the node to a trigger or another node
+
+### Delete Contact Example
+
+1. Add the telli node to your workflow
+2. Select the "Delete Contact" operation
+3. Enter the Contact ID (obtained from a previous Add Contact operation or from telli dashboard)
+4. Connect the node to a trigger or another node
+5. **Warning**: This action permanently deletes the contact and cannot be undone
+
+### Remove from Auto Dialer Example
+
+1. Add the telli node to your workflow
+2. Select the "Remove from Auto Dialer" operation
+3. Enter the Contact ID (obtained from a previous Add Contact operation or from telli dashboard)
+4. Connect the node to a trigger or another node
+5. This will stop the contact from receiving automated calls without deleting their data
 
 ### Schedule Call Example
 
