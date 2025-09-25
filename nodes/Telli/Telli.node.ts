@@ -44,19 +44,13 @@ export class Telli implements INodeType {
 						action: 'Add a new contact to telli',
 					},
 					{
-						name: 'Update Contact',
-						value: 'update-telli-contact',
-						description: 'Update an existing contact in telli',
-						action: 'Update a contact in telli',
-					},
-					{
 						name: 'Delete Contact',
 						value: 'delete-telli-contact',
 						description: 'Permanently delete a contact from telli',
 						action: 'Delete a contact from telli',
 					},
 					{
-						name: 'Remove from Auto Dialer',
+						name: 'Remove From Auto Dialer',
 						value: 'remove-from-auto-dialer',
 						description: 'Remove a contact from the auto dialer queue',
 						action: 'Remove a contact from auto dialer',
@@ -66,6 +60,12 @@ export class Telli implements INodeType {
 						value: 'schedule-telli-call',
 						description: 'Schedule a call with telli',
 						action: 'Schedule a call with telli',
+					},
+					{
+						name: 'Update Contact',
+						value: 'update-telli-contact',
+						description: 'Update an existing contact in telli',
+						action: 'Update a contact in telli',
 					},
 				],
 				default: 'add-telli-contact',
