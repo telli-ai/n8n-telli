@@ -50,6 +50,12 @@ export class Telli implements INodeType {
 						action: 'Delete a contact from telli',
 					},
 					{
+						name: 'Get Contact By External ID',
+						value: 'get-contact-by-external-id',
+						description: 'Retrieve detailed contact information using external contact ID',
+						action: 'Get contact by external ID',
+					},
+					{
 						name: 'Remove From Auto Dialer',
 						value: 'remove-from-auto-dialer',
 						description: 'Remove a contact from the auto dialer queue',
@@ -441,6 +447,22 @@ export class Telli implements INodeType {
 					},
 				},
 				description: 'Override the from number for the call',
+			},
+
+			// get-contact-by-external-id
+			{
+				displayName: 'External Contact ID',
+				name: 'externalContactId',
+				type: 'string',
+				default: '',
+				placeholder: 'your-internal-contact-ID-123',
+				displayOptions: {
+					show: {
+						operation: ['get-contact-by-external-id'],
+					},
+				},
+				required: true,
+				description: 'Your unique internal identifier for the contact',
 			}
 		],
 	};
@@ -649,6 +671,26 @@ export class Telli implements INodeType {
 
 						outputData.push({
 							json: callResponse,
+						});
+						break;
+
+					case 'get-contact-by-external-id':
+						const getExternalContactId = this.getNodeParameter('externalContactId', i) as string;
+
+						const getContactResponse = await this.helpers.httpRequestWithAuthentication.call(
+							this,
+							'telliApi',
+							{
+								method: 'GET',
+								url: `${BASE_API_URL}/get-contact-by-external-id/${getExternalContactId}`,
+								headers: {
+									'Content-Type': 'application/json',
+								},
+							},
+						);
+
+						outputData.push({
+							json: getContactResponse,
 						});
 						break;
 
