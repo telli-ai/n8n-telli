@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-telli",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "n8n community node which lets you use the telli AI phone calling platform in your n8n workflows",
   "keywords": [
     "n8n-community-node-package"
