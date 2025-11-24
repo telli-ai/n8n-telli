@@ -3,7 +3,6 @@ import {
 	INodeExecutionData,
 	INodeType,
 	INodeTypeDescription,
-	NodeConnectionType,
 	NodeOperationError,
 	IDataObject,
 } from 'n8n-workflow';
@@ -22,8 +21,8 @@ export class Telli implements INodeType {
 		defaults: {
 			name: 'telli',
 		},
-		inputs: [NodeConnectionType.Main],
-		outputs: [NodeConnectionType.Main],
+		inputs: ['main'],
+		outputs: ['main'],
 		credentials: [
 			{
 				name: 'telliApi',
@@ -72,6 +71,12 @@ export class Telli implements INodeType {
 						value: 'update-telli-contact',
 						description: 'Update an existing contact in telli',
 						action: 'Update a contact in telli',
+					},
+                    {
+						name: 'List Contacts',
+						value: 'list-telli-contacts',
+						description: 'Retrieve all contacts from telli',
+						action: 'List all contacts',
 					},
 				],
 				default: 'add-telli-contact',
@@ -475,6 +480,23 @@ export class Telli implements INodeType {
 		for (let i = 0; i < items.length; i++) {
 			try {
 				switch (operation) {
+					case 'list-telli-contacts':
+						const listResponse = await this.helpers.httpRequestWithAuthentication.call(
+							this,
+							'telliApi',
+							{
+								method: 'GET',
+								url: `${BASE_API_URL}/list-contacts`,
+								headers: {
+									'Content-Type': 'application/json',
+								},
+							},
+						);
+
+						outputData.push({
+							json: listResponse,
+						});
+						break;
 					case 'add-telli-contact':
 						const firstName = this.getNodeParameter('firstName', i) as string;
 						const lastName = this.getNodeParameter('lastName', i) as string;
@@ -697,7 +719,7 @@ export class Telli implements INodeType {
 					default:
 						throw new NodeOperationError(this.getNode(), `The operation "${operation}" is not supported!`);
 				}
-			} catch (error) {
+			} catch (error: any) {
 				if (error.response) {
 					const errorData = error.response.data || {};
 					const statusCode = error.response.status;
