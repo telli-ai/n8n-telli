@@ -48,8 +48,7 @@
       "dist/credentials/TelliApi.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/Telli/Telli.node.js",
-      "dist/nodes/TelliV2/TelliV2.node.js"
+      "dist/nodes/Telli/Telli.node.js"
     ]
   },
   "devDependencies": {
