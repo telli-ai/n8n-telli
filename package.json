@@ -28,7 +28,8 @@
     "prepublishOnly": "npm run build && npm run lint -c .eslintrc.prepublish.js nodes credentials package.json",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "test:api": "jest test/api --runInBand"
   },
   "files": [
     "dist/**/*",
@@ -64,5 +65,10 @@
   },
   "peerDependencies": {
     "n8n-workflow": "*"
+  },
+  "jest": {
+    "modulePathIgnorePatterns": [
+      "<rootDir>/dist/"
+    ]
   }
 }
