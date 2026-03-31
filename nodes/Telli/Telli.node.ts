@@ -996,18 +996,6 @@ export class Telli implements INodeType {
 				description: 'Property description',
 			},
 			{
-				displayName: 'Default Value',
-				name: 'contactPropertyDefaultValue',
-				type: 'string',
-				default: '',
-				displayOptions: {
-					show: {
-						operation: ['create-contact-property-v2', 'update-contact-property-v2'],
-					},
-				},
-				description: 'Default property value',
-			},
-			{
 				displayName: 'Options (JSON)',
 				name: 'contactPropertyOptions',
 				type: 'json',
@@ -1715,11 +1703,9 @@ export class Telli implements INodeType {
 						};
 						const createPropertyLabel = this.getNodeParameter('contactPropertyLabel', i, '') as string;
 						const createPropertyDescription = this.getNodeParameter('contactPropertyDescription', i, '') as string;
-						const createPropertyDefaultValue = this.getNodeParameter('contactPropertyDefaultValue', i, '') as string;
 						const createPropertyOptions = parseJsonInput(this.getNodeParameter('contactPropertyOptions', i, '[]'));
 						if (createPropertyLabel) createPropertyPayload.label = createPropertyLabel;
 						if (createPropertyDescription) createPropertyPayload.description = createPropertyDescription;
-						if (createPropertyDefaultValue) createPropertyPayload.defaultValue = createPropertyDefaultValue;
 						if (Array.isArray(createPropertyOptions) && createPropertyOptions.length > 0) createPropertyPayload.options = createPropertyOptions;
 						const createContactPropertyResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 							method: 'POST',
@@ -1736,11 +1722,9 @@ export class Telli implements INodeType {
 						const updatePropertyPayload: IDataObject = {};
 						const updatePropertyLabel = this.getNodeParameter('contactPropertyLabel', i, '') as string;
 						const updatePropertyDescription = this.getNodeParameter('contactPropertyDescription', i, '') as string;
-						const updatePropertyDefaultValue = this.getNodeParameter('contactPropertyDefaultValue', i, '') as string;
 						const updatePropertyOptions = parseJsonInput(this.getNodeParameter('contactPropertyOptions', i, '[]'));
 						if (updatePropertyLabel) updatePropertyPayload.label = updatePropertyLabel;
 						if (updatePropertyDescription) updatePropertyPayload.description = updatePropertyDescription;
-						if (updatePropertyDefaultValue) updatePropertyPayload.defaultValue = updatePropertyDefaultValue;
 						if (Array.isArray(updatePropertyOptions) && updatePropertyOptions.length > 0) updatePropertyPayload.options = updatePropertyOptions;
 						const updateContactPropertyResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 							method: 'PATCH',
