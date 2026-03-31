@@ -1179,7 +1179,7 @@ export class Telli implements INodeType {
 		for (let i = 0; i < items.length; i++) {
 			try {
 				switch (operation) {
-					case 'add-telli-contact':
+					case 'add-telli-contact': {
 						const firstName = this.getNodeParameter('firstName', i) as string;
 						const lastName = this.getNodeParameter('lastName', i) as string;
 						const phoneNumber = this.getNodeParameter('phoneNumber', i) as string;
@@ -1235,8 +1235,9 @@ export class Telli implements INodeType {
 							json: contactResponse,
 						});
 						break;
+					}
 
-					case 'update-telli-contact':
+					case 'update-telli-contact': {
 						const updateContactId = this.getNodeParameter('contactId', i) as string;
 						const updateFirstName = this.getNodeParameter('firstName', i, '') as string;
 						const updateLastName = this.getNodeParameter('lastName', i, '') as string;
@@ -1299,8 +1300,9 @@ export class Telli implements INodeType {
 							json: updateResponse,
 						});
 						break;
+					}
 
-					case 'delete-telli-contact':
+					case 'delete-telli-contact': {
 						const deleteContactId = this.getNodeParameter('contactId', i) as string;
 
 						const deleteResponse = await this.helpers.httpRequestWithAuthentication.call(
@@ -1319,8 +1321,9 @@ export class Telli implements INodeType {
 							json: deleteResponse,
 						});
 						break;
+					}
 
-					case 'remove-from-auto-dialer':
+					case 'remove-from-auto-dialer': {
 						const removeContactId = this.getNodeParameter('contactId', i) as string;
 
 						const removeData: IDataObject = {
@@ -1344,8 +1347,9 @@ export class Telli implements INodeType {
 							json: removeResponse,
 						});
 						break;
+					}
 
-					case 'schedule-telli-call':
+					case 'schedule-telli-call': {
 						const contactId = this.getNodeParameter('contactId', i) as string;
 						const agentId = this.getNodeParameter('agentId', i) as string;
 						const maxRetryDays = this.getNodeParameter('maxRetryDays', i) as number;
@@ -1377,8 +1381,9 @@ export class Telli implements INodeType {
 							json: callResponse,
 						});
 						break;
+					}
 
-					case 'get-contact-by-external-id':
+					case 'get-contact-by-external-id': {
 						const getExternalContactId = this.getNodeParameter('externalContactId', i) as string;
 
 						const getContactResponse = await this.helpers.httpRequestWithAuthentication.call(
@@ -1397,6 +1402,7 @@ export class Telli implements INodeType {
 							json: getContactResponse,
 						});
 						break;
+					}
 
 
 					case 'create-contact-v2': {
