@@ -615,6 +615,18 @@ export class Telli implements INodeType {
 
 			// v2 contacts and agents list limits
 			{
+				displayName: 'Return All',
+				name: 'returnAll',
+				type: 'boolean',
+				default: false,
+				displayOptions: {
+					show: {
+						operation: ['list-contacts-v2', 'list-agents-v2'],
+					},
+				},
+				description: 'Whether to return all results or only up to a given limit',
+			},
+			{
 				displayName: 'Limit',
 				name: 'listLimit',
 				type: 'number',
@@ -626,9 +638,23 @@ export class Telli implements INodeType {
 				displayOptions: {
 					show: {
 						operation: ['list-contacts-v2', 'list-agents-v2'],
+						returnAll: [false],
 					},
 				},
 				description: 'Maximum number of results to return',
+			},
+			{
+				displayName: 'Cursor',
+				name: 'cursor',
+				type: 'string',
+				default: '',
+				displayOptions: {
+					show: {
+						operation: ['list-contacts-v2', 'list-agents-v2'],
+						returnAll: [false],
+					},
+				},
+				description: 'Pagination cursor for requesting a specific page',
 			},
 
 
@@ -1479,14 +1505,56 @@ export class Telli implements INodeType {
 					}
 
 					case 'list-contacts-v2': {
-						const contactsLimit = this.getNodeParameter('listLimit', i, 50) as number;
-						const listContactsResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
-							method: 'GET',
-							url: `${API_ROOT_URL}/v2/contacts`,
-							headers: { 'Content-Type': 'application/json' },
-							qs: { limit: contactsLimit },
-						});
-						outputData.push({ json: listContactsResponse });
+						const contactsReturnAll = this.getNodeParameter('returnAll', i, false) as boolean;
+
+						if (contactsReturnAll) {
+							const allContacts: IDataObject[] = [];
+							let hasNextPage = false;
+							let nextCursor: string | null = null;
+
+							do {
+								const contactsQs: IDataObject = { limit: 100 };
+
+								if (nextCursor) {
+									contactsQs.cursor = nextCursor;
+								}
+
+								const listContactsResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
+									method: 'GET',
+									url: `${API_ROOT_URL}/v2/contacts`,
+									headers: { 'Content-Type': 'application/json' },
+									qs: contactsQs,
+								}) as IDataObject;
+
+								const contactsData = Array.isArray(listContactsResponse.data)
+									? (listContactsResponse.data as IDataObject[])
+									: [];
+								allContacts.push(...contactsData);
+
+								const pageInfo = (listContactsResponse.pageInfo ?? {}) as IDataObject;
+								hasNextPage = pageInfo.hasNextPage === true;
+								nextCursor = typeof pageInfo.nextCursor === 'string' ? pageInfo.nextCursor : null;
+							} while (hasNextPage && nextCursor !== null);
+
+							outputData.push({ json: { data: allContacts } });
+						} else {
+							const contactsLimit = this.getNodeParameter('listLimit', i, 50) as number;
+							const contactsCursor = this.getNodeParameter('cursor', i, '') as string;
+							const contactsQs: IDataObject = { limit: contactsLimit };
+
+							if (contactsCursor) {
+								contactsQs.cursor = contactsCursor;
+							}
+
+							const listContactsResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
+								method: 'GET',
+								url: `${API_ROOT_URL}/v2/contacts`,
+								headers: { 'Content-Type': 'application/json' },
+								qs: contactsQs,
+							});
+							outputData.push({ json: listContactsResponse });
+						}
+
 						break;
 					}
 
@@ -1513,14 +1581,56 @@ export class Telli implements INodeType {
 					}
 
 					case 'list-agents-v2': {
-						const agentsLimit = this.getNodeParameter('listLimit', i, 50) as number;
-						const listAgentsResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
-							method: 'GET',
-							url: `${API_ROOT_URL}/v2/agents`,
-							headers: { 'Content-Type': 'application/json' },
-							qs: { limit: agentsLimit },
-						});
-						outputData.push({ json: listAgentsResponse });
+						const agentsReturnAll = this.getNodeParameter('returnAll', i, false) as boolean;
+
+						if (agentsReturnAll) {
+							const allAgents: IDataObject[] = [];
+							let hasNextPage = false;
+							let nextCursor: string | null = null;
+
+							do {
+								const agentsQs: IDataObject = { limit: 100 };
+
+								if (nextCursor) {
+									agentsQs.cursor = nextCursor;
+								}
+
+								const listAgentsResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
+									method: 'GET',
+									url: `${API_ROOT_URL}/v2/agents`,
+									headers: { 'Content-Type': 'application/json' },
+									qs: agentsQs,
+								}) as IDataObject;
+
+								const agentsData = Array.isArray(listAgentsResponse.data)
+									? (listAgentsResponse.data as IDataObject[])
+									: [];
+								allAgents.push(...agentsData);
+
+								const pageInfo = (listAgentsResponse.pageInfo ?? {}) as IDataObject;
+								hasNextPage = pageInfo.hasNextPage === true;
+								nextCursor = typeof pageInfo.nextCursor === 'string' ? pageInfo.nextCursor : null;
+							} while (hasNextPage && nextCursor !== null);
+
+							outputData.push({ json: { data: allAgents } });
+						} else {
+							const agentsLimit = this.getNodeParameter('listLimit', i, 50) as number;
+							const agentsCursor = this.getNodeParameter('cursor', i, '') as string;
+							const agentsQs: IDataObject = { limit: agentsLimit };
+
+							if (agentsCursor) {
+								agentsQs.cursor = agentsCursor;
+							}
+
+							const listAgentsResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
+								method: 'GET',
+								url: `${API_ROOT_URL}/v2/agents`,
+								headers: { 'Content-Type': 'application/json' },
+								qs: agentsQs,
+							});
+							outputData.push({ json: listAgentsResponse });
+						}
+
 						break;
 					}
 
