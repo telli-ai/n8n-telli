@@ -808,7 +808,7 @@ export class Telli implements INodeType {
 						v2PropertiesMode: ['json'],
 					},
 				},
-				description: 'Custom properties as a JSON array of {key, value} objects. Example: [{"key": "company", "value": "Acme"}]',
+				description: 'Custom properties as a JSON array of {key, value} objects. Example: [{"key": "company", "value": "Acme"}].',
 			},
 
 			// old v1 get contact
@@ -849,7 +849,7 @@ export class Telli implements INodeType {
 						operation: ['get-telli-contacts-batch', 'remove-from-auto-dialer-batch-v1'],
 					},
 				},
-				description: 'JSON array of telli contact IDs (UUIDs). Example: ["3c90c3cc-0d44-4b50-8888-8dd25736052a", "4d01d4dd-..."]',
+				description: 'JSON array of telli contact IDs (UUIDs). Example: ["3c90c3cc-0d44-4b50-8888-8dd25736052a", "4d01d4dd-..."].',
 			},
 			{
 				displayName: 'Limit',
