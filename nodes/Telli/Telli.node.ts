@@ -2,7 +2,6 @@ import {
 	GenericValue,
 	IDataObject,
 	IExecuteFunctions,
-	IHttpRequestMethods,
 	ILoadOptionsFunctions,
 	INodeExecutionData,
 	INodePropertyOptions,
@@ -88,7 +87,6 @@ export class Telli implements INodeType {
 					{ name: 'Contact Property', value: 'contactProperty' },
 					{ name: 'Deprecated', value: 'deprecated' },
 					{ name: 'Phone Number', value: 'phoneNumber' },
-					{ name: 'Utility', value: 'utility' },
 				],
 				default: 'contact',
 			},
@@ -181,17 +179,6 @@ export class Telli implements INodeType {
 					{ name: 'Replace Phone Number', value: 'replace-phone-number-v1', action: 'Replace a phone number', description: 'Replace a phone number with a new one' },
 				],
 				default: 'list-phone-numbers-v1',
-			},
-			{
-				displayName: 'Operation',
-				name: 'operation',
-				type: 'options',
-				noDataExpression: true,
-				displayOptions: { show: { resource: ['utility'] } },
-				options: [
-					{ name: 'Make API Call', value: 'make-api-call-v1', action: 'Make an API call', description: 'Perform an arbitrary API call to telli' },
-				],
-				default: 'make-api-call-v1',
 			},
 
 			// add-contact
@@ -542,6 +529,7 @@ export class Telli implements INodeType {
 						operation: ['schedule-telli-call'],
 					},
 				},
+				required: true,
 				description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 			},
 			{
@@ -567,33 +555,6 @@ export class Telli implements INodeType {
 					},
 				},
 				description: 'Override the from number for the call',
-			},
-			{
-				displayName: 'Call Message',
-				name: 'callMessage',
-				type: 'string',
-				default: '',
-				typeOptions: {
-					rows: 3,
-				},
-				displayOptions: {
-					show: {
-						operation: ['schedule-telli-call'],
-					},
-				},
-				description: 'Optional message added to call_details for the scheduled call',
-			},
-			{
-				displayName: 'Call Questions (JSON)',
-				name: 'callQuestions',
-				type: 'json',
-				default: '[]',
-				displayOptions: {
-					show: {
-						operation: ['schedule-telli-call'],
-					},
-				},
-				description: 'Optional call_details.questions array for the scheduled call',
 			},
 
 			// get-contact-by-external-id
@@ -643,20 +604,6 @@ export class Telli implements INodeType {
 				},
 				description: 'Maximum number of results to return',
 			},
-			{
-				displayName: 'Cursor',
-				name: 'cursor',
-				type: 'string',
-				default: '',
-				displayOptions: {
-					show: {
-						operation: ['list-contacts-v2', 'list-agents-v2'],
-						returnAll: [false],
-					},
-				},
-				description: 'Pagination cursor for requesting a specific page',
-			},
-
 
 			{
 				displayName: 'Agent Name or ID',
@@ -687,7 +634,6 @@ export class Telli implements INodeType {
 							'get-contact-v2',
 							'update-contact-v2',
 							'delete-contact-v2',
-							'get-agent-v2',
 							'get-call-v1',
 							'replace-phone-number-v1',
 							'delete-phone-number-v1',
@@ -795,17 +741,74 @@ export class Telli implements INodeType {
 				},
 				description: 'Contact email address',
 			},
+			// v2 properties mode toggle + fields
 			{
-				displayName: 'Properties (JSON)',
-				name: 'v2Properties',
-				type: 'json',
-				default: '{}',
+				displayName: 'Properties Mode',
+				name: 'v2PropertiesMode',
+				type: 'options',
+				options: [
+					{ name: 'Using Fields Below', value: 'fields' },
+					{ name: 'Using JSON', value: 'json' },
+				],
+				default: 'fields',
 				displayOptions: {
 					show: {
 						operation: ['create-contact-v2', 'update-contact-v2'],
 					},
 				},
-				description: 'Custom properties object',
+				description: 'How to specify custom contact properties',
+			},
+			{
+				displayName: 'Properties',
+				name: 'v2PropertiesCollection',
+				placeholder: 'Add Property',
+				type: 'fixedCollection',
+				typeOptions: {
+					multipleValues: true,
+				},
+				default: {},
+				displayOptions: {
+					show: {
+						operation: ['create-contact-v2', 'update-contact-v2'],
+						v2PropertiesMode: ['fields'],
+					},
+				},
+				description: 'Custom contact properties as key/value pairs',
+				options: [
+					{
+						name: 'items',
+						displayName: 'Property',
+						values: [
+							{
+								displayName: 'Key',
+								name: 'key',
+								type: 'string',
+								default: '',
+								description: 'Property key',
+							},
+							{
+								displayName: 'Value',
+								name: 'value',
+								type: 'string',
+								default: '',
+								description: 'Property value',
+							},
+						],
+					},
+				],
+			},
+			{
+				displayName: 'Properties (JSON)',
+				name: 'v2Properties',
+				type: 'json',
+				default: '[]',
+				displayOptions: {
+					show: {
+						operation: ['create-contact-v2', 'update-contact-v2'],
+						v2PropertiesMode: ['json'],
+					},
+				},
+				description: 'Custom properties as a JSON array of {key, value} objects. Example: [{"key": "company", "value": "Acme"}]',
 			},
 
 			// old v1 get contact
@@ -846,7 +849,7 @@ export class Telli implements INodeType {
 						operation: ['get-telli-contacts-batch', 'remove-from-auto-dialer-batch-v1'],
 					},
 				},
-				description: 'Array of contact IDs',
+				description: 'JSON array of telli contact IDs (UUIDs). Example: ["3c90c3cc-0d44-4b50-8888-8dd25736052a", "4d01d4dd-..."]',
 			},
 			{
 				displayName: 'Limit',
@@ -873,7 +876,7 @@ export class Telli implements INodeType {
 						operation: ['schedule-calls-batch-v1'],
 					},
 				},
-				description: 'Array of call scheduling objects',
+				description: 'JSON array of call objects. Each object requires contact_id and agent_id. Example: [{"contact_id": "uuid", "agent_id": "uuid", "max_retry_days": 3}]. Max 50 per request.',
 			},
 
 			// call operations
@@ -995,6 +998,142 @@ export class Telli implements INodeType {
 				},
 				description: 'Property description',
 			},
+
+			// contact property options - mode toggle for create (only select/multi_select)
+			{
+				displayName: 'Options Mode',
+				name: 'contactPropertyOptionsMode',
+				type: 'options',
+				options: [
+					{ name: 'Using Fields Below', value: 'fields' },
+					{ name: 'Using JSON', value: 'json' },
+				],
+				default: 'fields',
+				displayOptions: {
+					show: {
+						operation: ['create-contact-property-v2'],
+						contactPropertyDataType: ['select', 'multi_select'],
+					},
+				},
+				description: 'How to specify options for select/multi_select properties',
+			},
+			// contact property options - mode toggle for update (always visible)
+			{
+				displayName: 'Options Mode',
+				name: 'contactPropertyOptionsMode',
+				type: 'options',
+				options: [
+					{ name: 'Using Fields Below', value: 'fields' },
+					{ name: 'Using JSON', value: 'json' },
+				],
+				default: 'fields',
+				displayOptions: {
+					show: {
+						operation: ['update-contact-property-v2'],
+					},
+				},
+				description: 'How to specify options for select/multi_select properties',
+			},
+			// contact property options - fixedCollection for create
+			{
+				displayName: 'Options',
+				name: 'contactPropertyOptionsCollection',
+				placeholder: 'Add Option',
+				type: 'fixedCollection',
+				typeOptions: {
+					multipleValues: true,
+				},
+				default: {},
+				displayOptions: {
+					show: {
+						operation: ['create-contact-property-v2'],
+						contactPropertyDataType: ['select', 'multi_select'],
+						contactPropertyOptionsMode: ['fields'],
+					},
+				},
+				description: 'Options for select/multi_select properties',
+				options: [
+					{
+						name: 'items',
+						displayName: 'Option',
+						values: [
+							{
+								displayName: 'Value',
+								name: 'value',
+								type: 'string',
+								default: '',
+								required: true,
+								description: 'Option value',
+							},
+							{
+								displayName: 'Label',
+								name: 'label',
+								type: 'string',
+								default: '',
+								required: true,
+								description: 'Option display label',
+							},
+							{
+								displayName: 'Description',
+								name: 'description',
+								type: 'string',
+								default: '',
+								description: 'Option description',
+							},
+						],
+					},
+				],
+			},
+			// contact property options - fixedCollection for update
+			{
+				displayName: 'Options',
+				name: 'contactPropertyOptionsCollection',
+				placeholder: 'Add Option',
+				type: 'fixedCollection',
+				typeOptions: {
+					multipleValues: true,
+				},
+				default: {},
+				displayOptions: {
+					show: {
+						operation: ['update-contact-property-v2'],
+						contactPropertyOptionsMode: ['fields'],
+					},
+				},
+				description: 'Options for select/multi_select properties',
+				options: [
+					{
+						name: 'items',
+						displayName: 'Option',
+						values: [
+							{
+								displayName: 'Value',
+								name: 'value',
+								type: 'string',
+								default: '',
+								required: true,
+								description: 'Option value',
+							},
+							{
+								displayName: 'Label',
+								name: 'label',
+								type: 'string',
+								default: '',
+								required: true,
+								description: 'Option display label',
+							},
+							{
+								displayName: 'Description',
+								name: 'description',
+								type: 'string',
+								default: '',
+								description: 'Option description',
+							},
+						],
+					},
+				],
+			},
+			// contact property options - JSON for create
 			{
 				displayName: 'Options (JSON)',
 				name: 'contactPropertyOptions',
@@ -1002,10 +1141,26 @@ export class Telli implements INodeType {
 				default: '[]',
 				displayOptions: {
 					show: {
-						operation: ['create-contact-property-v2', 'update-contact-property-v2'],
+						operation: ['create-contact-property-v2'],
+						contactPropertyDataType: ['select', 'multi_select'],
+						contactPropertyOptionsMode: ['json'],
 					},
 				},
-				description: 'Options array for select and multi_select data types',
+				description: 'Options array as JSON. Each object: {value, label, description?}. Example: [{"value": "a", "label": "Option A"}]',
+			},
+			// contact property options - JSON for update
+			{
+				displayName: 'Options (JSON)',
+				name: 'contactPropertyOptions',
+				type: 'json',
+				default: '[]',
+				displayOptions: {
+					show: {
+						operation: ['update-contact-property-v2'],
+						contactPropertyOptionsMode: ['json'],
+					},
+				},
+				description: 'Options array as JSON. Each object: {value, label, description?}. Example: [{"value": "a", "label": "Option A"}]',
 			},
 
 			// phone number operations
@@ -1064,103 +1219,6 @@ export class Telli implements INodeType {
 				required: true,
 				description: 'SIP trunk auth password',
 			},
-
-			// make api call
-			{
-				displayName: 'Path',
-				name: 'apiPath',
-				type: 'string',
-				default: '/v1/get-contact/{contactId}',
-				displayOptions: {
-					show: {
-						operation: ['make-api-call-v1'],
-					},
-				},
-				required: true,
-				description: 'Relative API path starting with /v1 or /v2',
-			},
-			{
-				displayName: 'Method',
-				name: 'apiMethod',
-				type: 'options',
-				options: [
-					{ name: 'DELETE', value: 'DELETE' },
-					{ name: 'GET', value: 'GET' },
-					{ name: 'PATCH', value: 'PATCH' },
-					{ name: 'POST', value: 'POST' },
-					{ name: 'PUT', value: 'PUT' },
-				],
-				default: 'GET',
-				displayOptions: {
-					show: {
-						operation: ['make-api-call-v1'],
-					},
-				},
-				required: true,
-				description: 'HTTP method',
-			},
-			{
-				displayName: 'Headers',
-				name: 'apiHeaders',
-				type: 'fixedCollection',
-				default: {},
-				typeOptions: {
-					multipleValues: true,
-				},
-				displayOptions: {
-					show: {
-						operation: ['make-api-call-v1'],
-					},
-				},
-				options: [
-					{
-						name: 'items',
-						displayName: 'Header',
-						values: [
-							{ displayName: 'Key', name: 'key', type: 'string', default: '' },
-							{ displayName: 'Value', name: 'value', type: 'string', default: '' },
-						],
-					},
-				],
-				description: 'Additional request headers. Authorization is added automatically.',
-			},
-			{
-				displayName: 'Query Parameters',
-				name: 'apiQueryParams',
-				type: 'fixedCollection',
-				default: {},
-				typeOptions: {
-					multipleValues: true,
-				},
-				displayOptions: {
-					show: {
-						operation: ['make-api-call-v1'],
-					},
-				},
-				options: [
-					{
-						name: 'items',
-						displayName: 'Parameter',
-						values: [
-							{ displayName: 'Key', name: 'key', type: 'string', default: '' },
-							{ displayName: 'Value', name: 'value', type: 'string', default: '' },
-						],
-					},
-				],
-				description: 'Query string parameters',
-			},
-			{
-				displayName: 'Body (JSON)',
-				name: 'apiBody',
-				type: 'json',
-				default: '{}',
-				displayOptions: {
-					show: {
-						operation: ['make-api-call-v1'],
-					},
-				},
-				description: 'Optional request body',
-			},
 		],
 
 	};
@@ -1177,17 +1235,6 @@ export class Telli implements INodeType {
 				return JSON.parse(trimmed) as GenericValue | GenericValue[];
 			}
 			return value as GenericValue | GenericValue[] | undefined;
-		};
-
-		const parseKeyValueList = (collection: IDataObject): IDataObject => {
-			const result: IDataObject = {};
-			const list = (collection.items as IDataObject[]) || [];
-			for (const item of list) {
-				if (item.key) {
-					result[item.key as string] = item.value;
-				}
-			}
-			return result;
 		};
 
 		for (let i = 0; i < items.length; i++) {
@@ -1371,10 +1418,9 @@ export class Telli implements INodeType {
 						
 						const callData: IDataObject = {
 							contact_id: contactId,
+							agent_id: agentId,
 						};
 						
-						// optional fields
-						if (agentId) callData.agent_id = agentId;
 						if (maxRetryDays !== undefined) callData.max_retry_days = maxRetryDays;
 						if (overrideFromNumber) callData.override_from_number = overrideFromNumber;
 
@@ -1433,13 +1479,32 @@ export class Telli implements INodeType {
 						const v2Salutation = this.getNodeParameter('v2Salutation', i, '') as string;
 						const v2TimezoneIana = this.getNodeParameter('v2TimezoneIana', i, '') as string;
 						const v2Email = this.getNodeParameter('v2Email', i, '') as string;
-						const v2Properties = parseJsonInput(this.getNodeParameter('v2Properties', i, '{}')) as IDataObject | undefined;
 						if (v2ExternalId) createContactData.externalId = v2ExternalId;
 						if (v2ExternalUrl) createContactData.externalUrl = v2ExternalUrl;
 						if (v2Salutation) createContactData.salutation = v2Salutation;
 						if (v2TimezoneIana) createContactData.timezoneIana = v2TimezoneIana;
 						if (v2Email) createContactData.email = v2Email;
-						if (v2Properties && typeof v2Properties === 'object' && Object.keys(v2Properties).length > 0) createContactData.properties = v2Properties;
+
+						// read properties based on mode
+						const createPropsMode = this.getNodeParameter('v2PropertiesMode', i, 'fields') as string;
+						let createProperties: IDataObject[] | undefined;
+						if (createPropsMode === 'fields') {
+							const propsCollection = this.getNodeParameter('v2PropertiesCollection', i, { items: [] }) as IDataObject;
+							const propItems = (propsCollection.items as IDataObject[]) || [];
+							if (propItems.length > 0) {
+								createProperties = propItems.map((item) => ({
+									key: item.key as string,
+									value: item.value,
+								}));
+							}
+						} else {
+							const parsed = parseJsonInput(this.getNodeParameter('v2Properties', i, '[]'));
+							if (Array.isArray(parsed) && parsed.length > 0) {
+								createProperties = parsed as IDataObject[];
+							}
+						}
+						if (createProperties && createProperties.length > 0) createContactData.properties = createProperties;
+
 						const createContactResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 							method: 'POST',
 							url: `${API_ROOT_URL}/v2/contacts`,
@@ -1461,7 +1526,6 @@ export class Telli implements INodeType {
 						const updateV2Salutation = this.getNodeParameter('v2Salutation', i, '') as string;
 						const updateV2TimezoneIana = this.getNodeParameter('v2TimezoneIana', i, '') as string;
 						const updateV2Email = this.getNodeParameter('v2Email', i, '') as string;
-						const updateV2Properties = parseJsonInput(this.getNodeParameter('v2Properties', i, '{}')) as IDataObject | undefined;
 						if (updateV2FirstName) updateContactV2Data.firstName = updateV2FirstName;
 						if (updateV2LastName) updateContactV2Data.lastName = updateV2LastName;
 						if (updateV2PhoneNumber) updateContactV2Data.phoneNumber = updateV2PhoneNumber;
@@ -1470,7 +1534,27 @@ export class Telli implements INodeType {
 						if (updateV2Salutation) updateContactV2Data.salutation = updateV2Salutation;
 						if (updateV2TimezoneIana) updateContactV2Data.timezoneIana = updateV2TimezoneIana;
 						if (updateV2Email) updateContactV2Data.email = updateV2Email;
-						if (updateV2Properties && typeof updateV2Properties === 'object' && Object.keys(updateV2Properties).length > 0) updateContactV2Data.properties = updateV2Properties;
+
+						// read properties based on mode
+						const updatePropsMode = this.getNodeParameter('v2PropertiesMode', i, 'fields') as string;
+						let updateProperties: IDataObject[] | undefined;
+						if (updatePropsMode === 'fields') {
+							const propsCollection = this.getNodeParameter('v2PropertiesCollection', i, { items: [] }) as IDataObject;
+							const propItems = (propsCollection.items as IDataObject[]) || [];
+							if (propItems.length > 0) {
+								updateProperties = propItems.map((item) => ({
+									key: item.key as string,
+									value: item.value,
+								}));
+							}
+						} else {
+							const parsed = parseJsonInput(this.getNodeParameter('v2Properties', i, '[]'));
+							if (Array.isArray(parsed) && parsed.length > 0) {
+								updateProperties = parsed as IDataObject[];
+							}
+						}
+						if (updateProperties && updateProperties.length > 0) updateContactV2Data.properties = updateProperties;
+
 						const updateContactV2Response = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 							method: 'PATCH',
 							url: `${API_ROOT_URL}/v2/contacts/${updateV2Id}`,
@@ -1527,12 +1611,7 @@ export class Telli implements INodeType {
 							outputData.push({ json: { data: allContacts } });
 						} else {
 							const contactsLimit = this.getNodeParameter('listLimit', i, 50) as number;
-							const contactsCursor = this.getNodeParameter('cursor', i, '') as string;
 							const contactsQs: IDataObject = { limit: contactsLimit };
-
-							if (contactsCursor) {
-								contactsQs.cursor = contactsCursor;
-							}
 
 							const listContactsResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 								method: 'GET',
@@ -1603,12 +1682,7 @@ export class Telli implements INodeType {
 							outputData.push({ json: { data: allAgents } });
 						} else {
 							const agentsLimit = this.getNodeParameter('listLimit', i, 50) as number;
-							const agentsCursor = this.getNodeParameter('cursor', i, '') as string;
 							const agentsQs: IDataObject = { limit: agentsLimit };
-
-							if (agentsCursor) {
-								agentsQs.cursor = agentsCursor;
-							}
 
 							const listAgentsResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 								method: 'GET',
@@ -1703,10 +1777,36 @@ export class Telli implements INodeType {
 						};
 						const createPropertyLabel = this.getNodeParameter('contactPropertyLabel', i, '') as string;
 						const createPropertyDescription = this.getNodeParameter('contactPropertyDescription', i, '') as string;
-						const createPropertyOptions = parseJsonInput(this.getNodeParameter('contactPropertyOptions', i, '[]'));
 						if (createPropertyLabel) createPropertyPayload.label = createPropertyLabel;
 						if (createPropertyDescription) createPropertyPayload.description = createPropertyDescription;
-						if (Array.isArray(createPropertyOptions) && createPropertyOptions.length > 0) createPropertyPayload.options = createPropertyOptions;
+
+						// only read options for select/multi_select
+						const createDataType = createPropertyPayload.dataType as string;
+						if (createDataType === 'select' || createDataType === 'multi_select') {
+							const optionsMode = this.getNodeParameter('contactPropertyOptionsMode', i, 'fields') as string;
+							let propertyOptions: IDataObject[] | undefined;
+							if (optionsMode === 'fields') {
+								const optionsCollection = this.getNodeParameter('contactPropertyOptionsCollection', i, { items: [] }) as IDataObject;
+								const optionItems = (optionsCollection.items as IDataObject[]) || [];
+								if (optionItems.length > 0) {
+									propertyOptions = optionItems.map((item) => {
+										const opt: IDataObject = {
+											value: item.value as string,
+											label: item.label as string,
+										};
+										if (item.description) opt.description = item.description as string;
+										return opt;
+									});
+								}
+							} else {
+								const parsed = parseJsonInput(this.getNodeParameter('contactPropertyOptions', i, '[]'));
+								if (Array.isArray(parsed) && parsed.length > 0) {
+									propertyOptions = parsed as IDataObject[];
+								}
+							}
+							if (propertyOptions && propertyOptions.length > 0) createPropertyPayload.options = propertyOptions;
+						}
+
 						const createContactPropertyResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 							method: 'POST',
 							url: `${API_ROOT_URL}/v2/properties/contacts`,
@@ -1722,10 +1822,33 @@ export class Telli implements INodeType {
 						const updatePropertyPayload: IDataObject = {};
 						const updatePropertyLabel = this.getNodeParameter('contactPropertyLabel', i, '') as string;
 						const updatePropertyDescription = this.getNodeParameter('contactPropertyDescription', i, '') as string;
-						const updatePropertyOptions = parseJsonInput(this.getNodeParameter('contactPropertyOptions', i, '[]'));
 						if (updatePropertyLabel) updatePropertyPayload.label = updatePropertyLabel;
 						if (updatePropertyDescription) updatePropertyPayload.description = updatePropertyDescription;
-						if (Array.isArray(updatePropertyOptions) && updatePropertyOptions.length > 0) updatePropertyPayload.options = updatePropertyOptions;
+
+						// always try to read options for update (we don't know the dataType)
+						const updateOptionsMode = this.getNodeParameter('contactPropertyOptionsMode', i, 'fields') as string;
+						let updatePropertyOptions: IDataObject[] | undefined;
+						if (updateOptionsMode === 'fields') {
+							const optionsCollection = this.getNodeParameter('contactPropertyOptionsCollection', i, { items: [] }) as IDataObject;
+							const optionItems = (optionsCollection.items as IDataObject[]) || [];
+							if (optionItems.length > 0) {
+								updatePropertyOptions = optionItems.map((item) => {
+									const opt: IDataObject = {
+										value: item.value as string,
+										label: item.label as string,
+									};
+									if (item.description) opt.description = item.description as string;
+									return opt;
+								});
+							}
+						} else {
+							const parsed = parseJsonInput(this.getNodeParameter('contactPropertyOptions', i, '[]'));
+							if (Array.isArray(parsed) && parsed.length > 0) {
+								updatePropertyOptions = parsed as IDataObject[];
+							}
+						}
+						if (updatePropertyOptions && updatePropertyOptions.length > 0) updatePropertyPayload.options = updatePropertyOptions;
+
 						const updateContactPropertyResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 							method: 'PATCH',
 							url: `${API_ROOT_URL}/v2/properties/contacts/${updatePropertyKey}`,
@@ -1793,25 +1916,6 @@ export class Telli implements INodeType {
 							body: { contact_ids: removeBatchIds },
 						});
 						outputData.push({ json: removeBatchResponse });
-						break;
-					}
-
-					case 'make-api-call-v1': {
-						const apiPath = this.getNodeParameter('apiPath', i) as string;
-						const apiMethod = this.getNodeParameter('apiMethod', i) as IHttpRequestMethods;
-						const apiHeadersCollection = this.getNodeParameter('apiHeaders', i, { items: [] }) as IDataObject;
-						const apiQueryCollection = this.getNodeParameter('apiQueryParams', i, { items: [] }) as IDataObject;
-						const apiBody = parseJsonInput(this.getNodeParameter('apiBody', i, '{}'));
-						const apiHeaders = parseKeyValueList(apiHeadersCollection);
-						const apiQs = parseKeyValueList(apiQueryCollection);
-						const customApiResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
-							method: apiMethod,
-							url: `${API_ROOT_URL}${apiPath}`,
-							headers: apiHeaders,
-							qs: apiQs,
-							body: apiBody,
-						});
-						outputData.push({ json: customApiResponse });
 						break;
 					}
 
@@ -1904,4 +2008,4 @@ export class Telli implements INodeType {
 
 		return [outputData];
 	}
-} 
+}
