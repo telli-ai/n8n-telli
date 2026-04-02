@@ -1371,7 +1371,7 @@ export class Telli implements INodeType {
 							'telliApi',
 							{
 								method: 'DELETE',
-								url: `${BASE_API_URL}/delete-contact/${deleteContactId}`,
+								url: `${API_ROOT_URL}/v2/contacts/${deleteContactId}`,
 								headers: {
 									'Content-Type': 'text/plain',
 								},
