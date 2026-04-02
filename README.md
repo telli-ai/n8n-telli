@@ -113,16 +113,15 @@ The telli node provides the following operations, grouped by resource:
 
 These operations use the legacy v1 API and are kept for backward compatibility with existing workflows. Use the Contact resource above for new workflows.
 
-| Operation | Description |
-| --- | --- |
-| Add Contact | Add a contact using the v1 endpoint |
-| Add Contacts (Batch) | Add multiple contacts in one request |
-| Get Contact | Get a contact by ID using the v1 endpoint |
-| Get Contact by External ID | Get a contact by external ID using the v1 endpoint |
-| Get Contacts (Batch) | Get multiple contacts in one request |
-| Update Contact | Update a contact using the v1 endpoint |
-| Update Contacts (Batch) | Update multiple contacts in one request |
-| Delete Contact | Delete a contact (uses v2 API under the hood) |
+| Operation | Description | API Docs |
+| --- | --- | --- |
+| Add Contact | Add a contact using the v1 endpoint | [Docs](https://docs.telli.com/endpoint/add-contact) |
+| Add Contacts (Batch) | Add multiple contacts in one request | [Docs](https://docs.telli.com/endpoint/add-contacts-batch) |
+| Get Contact | Get a contact by ID using the v1 endpoint | [Docs](https://docs.telli.com/endpoint/get-contact) |
+| Get Contact by External ID | Get a contact by external ID using the v1 endpoint | [Docs](https://docs.telli.com/endpoint/get-contact-by-external-id) |
+| Get Contacts (Batch) | Get multiple contacts in one request | [Docs](https://docs.telli.com/endpoint/get-contacts-batch) |
+| Update Contact | Update a contact using the v1 endpoint | [Docs](https://docs.telli.com/endpoint/update-contact) |
+| Update Contacts (Batch) | Update multiple contacts in one request | [Docs](https://docs.telli.com/endpoint/update-contacts-batch) |
 
 ## Credentials
 
