@@ -116,12 +116,12 @@ These operations use the legacy v1 API and are kept for backward compatibility w
 | Operation | Description | API Docs |
 | --- | --- | --- |
 | Add Contact | Add a contact using the v1 endpoint | [Docs](https://docs.telli.com/endpoint/add-contact) |
-| Add Contacts (Batch) | Add multiple contacts in one request | [Docs](https://docs.telli.com/endpoint/add-contacts-batch) |
+| Add Contacts (Batch) | Add multiple contacts using the v1 batch endpoint | [Docs](https://docs.telli.com/endpoint/add-contacts-batch) |
 | Get Contact | Get a contact by ID using the v1 endpoint | [Docs](https://docs.telli.com/endpoint/get-contact) |
 | Get Contact by External ID | Get a contact by external ID using the v1 endpoint | [Docs](https://docs.telli.com/endpoint/get-contact-by-external-id) |
-| Get Contacts (Batch) | Get multiple contacts in one request | [Docs](https://docs.telli.com/endpoint/get-contacts-batch) |
+| Get Contacts (Batch) | Get multiple contacts using the v1 batch endpoint | [Docs](https://docs.telli.com/endpoint/get-contacts-batch) |
 | Update Contact | Update a contact using the v1 endpoint | [Docs](https://docs.telli.com/endpoint/update-contact) |
-| Update Contacts (Batch) | Update multiple contacts in one request | [Docs](https://docs.telli.com/endpoint/update-contacts-batch) |
+| Update Contacts (Batch) | Update multiple contacts using the v1 batch endpoint | [Docs](https://docs.telli.com/endpoint/update-contacts-batch) |
 
 ## Credentials
 
