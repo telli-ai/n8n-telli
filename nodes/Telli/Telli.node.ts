@@ -536,13 +536,13 @@ export class Telli implements INodeType {
 				displayName: 'Max Retry Days',
 				name: 'maxRetryDays',
 				type: 'number',
-				default: 3,
+				default: 0,
 				displayOptions: {
 					show: {
 						operation: ['schedule-telli-call'],
 					},
 				},
-				description: 'Optional number of days to retry the call. Defaults to the account\'s max retry days.',
+				description: 'Number of days to retry the call. Leave at 0 to use the account default.',
 			},
 			{
 				displayName: 'Override From Number',
@@ -1421,7 +1421,7 @@ export class Telli implements INodeType {
 							agent_id: agentId,
 						};
 						
-						if (maxRetryDays !== undefined) callData.max_retry_days = maxRetryDays;
+						if (maxRetryDays > 0) callData.max_retry_days = maxRetryDays;
 						if (overrideFromNumber) callData.override_from_number = overrideFromNumber;
 
 						const callResponse = await this.helpers.httpRequestWithAuthentication.call(
