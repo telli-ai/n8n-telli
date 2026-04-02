@@ -157,7 +157,6 @@ export class Telli implements INodeType {
 				options: [
 					{ name: 'Add Contact', value: 'add-telli-contact', action: 'Add a new contact to telli', description: 'Add a contact using the v1 endpoint' },
 					{ name: 'Add Contacts (Batch)', value: 'add-telli-contacts-batch', action: 'Add contacts in batch', description: 'Add multiple contacts using the v1 batch endpoint' },
-					{ name: 'Delete Contact', value: 'delete-telli-contact', action: 'Delete a contact from telli', description: 'Permanently delete a contact from telli' },
 					{ name: 'Get Contact', value: 'get-telli-contact', action: 'Get a contact', description: 'Get a contact by ID using the v1 endpoint' },
 					{ name: 'Get Contact by External ID', value: 'get-contact-by-external-id', action: 'Get contact by external ID', description: 'Get a contact by external ID using the v1 endpoint' },
 					{ name: 'Get Contacts (Batch)', value: 'get-telli-contacts-batch', action: 'Get contacts in batch', description: 'Get multiple contacts using the v1 batch endpoint' },
@@ -466,22 +465,6 @@ export class Telli implements INodeType {
 						],
 					},
 				],
-			},
-
-			// delete-contact
-			{
-				displayName: 'Contact ID',
-				name: 'contactId',
-				type: 'string',
-				default: '',
-				placeholder: '3c90c3cc-0d44-4b50-8888-8dd25736052a',
-				displayOptions: {
-					show: {
-						operation: ['delete-telli-contact'],
-					},
-				},
-				required: true,
-				description: 'The telli contact ID to delete',
 			},
 
 			// remove-from-auto-dialer
