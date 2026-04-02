@@ -22,7 +22,7 @@ export class Telli implements INodeType {
 					method: 'GET',
 					url: `${API_ROOT_URL}/v2/agents`,
 					headers: {
-						'Content-Type': 'application/json',
+						'Content-Type': 'text/plain',
 					},
 					qs: {
 						limit: 100,
@@ -1286,7 +1286,7 @@ export class Telli implements INodeType {
 								method: 'POST',
 								url: `${BASE_API_URL}/add-contact`,
 								headers: {
-									'Content-Type': 'application/json',
+									'Content-Type': 'text/plain',
 								},
 								body: contactData,
 							},
@@ -1351,7 +1351,7 @@ export class Telli implements INodeType {
 								method: 'PATCH',
 								url: `${BASE_API_URL}/update-contact`,
 								headers: {
-									'Content-Type': 'application/json',
+									'Content-Type': 'text/plain',
 								},
 								body: updateData,
 							},
@@ -1373,7 +1373,7 @@ export class Telli implements INodeType {
 								method: 'DELETE',
 								url: `${BASE_API_URL}/delete-contact/${deleteContactId}`,
 								headers: {
-									'Content-Type': 'application/json',
+									'Content-Type': 'text/plain',
 								},
 							},
 						);
@@ -1431,7 +1431,7 @@ export class Telli implements INodeType {
 								method: 'POST',
 								url: `${BASE_API_URL}/schedule-call`,
 								headers: {
-									'Content-Type': 'application/json',
+									'Content-Type': 'text/plain',
 								},
 								body: callData,
 							},
@@ -1453,7 +1453,7 @@ export class Telli implements INodeType {
 								method: 'GET',
 								url: `${BASE_API_URL}/get-contact-by-external-id/${getExternalContactId}`,
 								headers: {
-									'Content-Type': 'application/json',
+									'Content-Type': 'text/plain',
 								},
 							},
 						);
