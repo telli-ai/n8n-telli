@@ -791,7 +791,7 @@ export class Telli implements INodeType {
 								name: 'value',
 								type: 'string',
 								default: '',
-								description: 'Property value',
+								description: 'Property value. For multi-select use a JSON array e.g. ["opt1","opt2"]. Numbers and booleans are auto-detected.',
 							},
 						],
 					},
@@ -1237,6 +1237,17 @@ export class Telli implements INodeType {
 			return value as GenericValue | GenericValue[] | undefined;
 		};
 
+		// Attempt to parse a string value as JSON so that arrays, numbers and booleans
+		// are sent with the correct type instead of as plain strings.
+		const coercePropertyValue = (raw: unknown): GenericValue | GenericValue[] => {
+			if (typeof raw !== 'string') return raw as GenericValue;
+			try {
+				return JSON.parse(raw) as GenericValue | GenericValue[];
+			} catch {
+				return raw;
+			}
+		};
+
 		for (let i = 0; i < items.length; i++) {
 			try {
 				switch (operation) {
@@ -1494,7 +1505,7 @@ export class Telli implements INodeType {
 							if (propItems.length > 0) {
 								createProperties = propItems.map((item) => ({
 									key: item.key as string,
-									value: item.value,
+									value: coercePropertyValue(item.value),
 								}));
 							}
 						} else {
@@ -1544,7 +1555,7 @@ export class Telli implements INodeType {
 							if (propItems.length > 0) {
 								updateProperties = propItems.map((item) => ({
 									key: item.key as string,
-									value: item.value,
+									value: coercePropertyValue(item.value),
 								}));
 							}
 						} else {
