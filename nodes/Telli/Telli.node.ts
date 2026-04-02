@@ -1867,6 +1867,7 @@ export class Telli implements INodeType {
 						const replacePhoneNumberResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 							method: 'POST',
 							url: `${BASE_API_URL}/phone-numbers/${replacePhoneNumberId}/replace`,
+							headers: { 'Content-Type': 'application/json' },
 							body: {},
 						});
 						outputData.push({ json: replacePhoneNumberResponse });
