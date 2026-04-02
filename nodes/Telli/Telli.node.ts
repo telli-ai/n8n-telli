@@ -1286,7 +1286,7 @@ export class Telli implements INodeType {
 								method: 'POST',
 								url: `${BASE_API_URL}/add-contact`,
 								headers: {
-									'Content-Type': 'text/plain',
+									'Content-Type': 'application/json',
 								},
 								body: contactData,
 							},
@@ -1351,7 +1351,7 @@ export class Telli implements INodeType {
 								method: 'PATCH',
 								url: `${BASE_API_URL}/update-contact`,
 								headers: {
-									'Content-Type': 'text/plain',
+									'Content-Type': 'application/json',
 								},
 								body: updateData,
 							},
@@ -1431,7 +1431,7 @@ export class Telli implements INodeType {
 								method: 'POST',
 								url: `${BASE_API_URL}/schedule-call`,
 								headers: {
-									'Content-Type': 'text/plain',
+									'Content-Type': 'application/json',
 								},
 								body: callData,
 							},
