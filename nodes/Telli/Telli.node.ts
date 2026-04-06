@@ -11,7 +11,8 @@ import {
 } from 'n8n-workflow';
 
 const API_ROOT_URL = 'https://api.telli.com';
-const BASE_API_URL = `${API_ROOT_URL}/v1`;
+const V1_API_URL = `${API_ROOT_URL}/v1`;
+const V2_API_URL = `${API_ROOT_URL}/v2`;
 
 export class Telli implements INodeType {
 
@@ -20,7 +21,7 @@ export class Telli implements INodeType {
 			async getAgents(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const response = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 					method: 'GET',
-					url: `${API_ROOT_URL}/v2/agents`,
+					url: `${V2_API_URL}/agents`,
 					headers: {
 						'Content-Type': 'text/plain',
 					},
@@ -1278,7 +1279,7 @@ export class Telli implements INodeType {
 							'telliApi',
 							{
 								method: 'POST',
-								url: `${BASE_API_URL}/add-contact`,
+								url: `${V1_API_URL}/add-contact`,
 								headers: {
 									'Content-Type': 'application/json',
 								},
@@ -1343,7 +1344,7 @@ export class Telli implements INodeType {
 							'telliApi',
 							{
 								method: 'PATCH',
-								url: `${BASE_API_URL}/update-contact`,
+								url: `${V1_API_URL}/update-contact`,
 								headers: {
 									'Content-Type': 'application/json',
 								},
@@ -1365,7 +1366,7 @@ export class Telli implements INodeType {
 							'telliApi',
 							{
 								method: 'DELETE',
-								url: `${API_ROOT_URL}/v2/contacts/${deleteContactId}`,
+								url: `${V2_API_URL}/contacts/${deleteContactId}`,
 								headers: {
 									'Content-Type': 'text/plain',
 								},
@@ -1390,7 +1391,7 @@ export class Telli implements INodeType {
 							'telliApi',
 							{
 								method: 'POST',
-								url: `${BASE_API_URL}/remove-from-auto-dialer`,
+								url: `${V1_API_URL}/remove-from-auto-dialer`,
 								headers: {
 									'Content-Type': 'application/json',
 								},
@@ -1423,7 +1424,7 @@ export class Telli implements INodeType {
 							'telliApi',
 							{
 								method: 'POST',
-								url: `${BASE_API_URL}/schedule-call`,
+								url: `${V1_API_URL}/schedule-call`,
 								headers: {
 									'Content-Type': 'application/json',
 								},
@@ -1445,7 +1446,7 @@ export class Telli implements INodeType {
 							'telliApi',
 							{
 								method: 'GET',
-								url: `${BASE_API_URL}/get-contact-by-external-id/${getExternalContactId}`,
+								url: `${V1_API_URL}/get-contact-by-external-id/${getExternalContactId}`,
 								headers: {
 									'Content-Type': 'text/plain',
 								},
@@ -1501,7 +1502,7 @@ export class Telli implements INodeType {
 
 						const createContactResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 							method: 'POST',
-							url: `${API_ROOT_URL}/v2/contacts`,
+							url: `${V2_API_URL}/contacts`,
 							headers: { 'Content-Type': 'application/json' },
 							body: createContactData,
 						});
@@ -1551,7 +1552,7 @@ export class Telli implements INodeType {
 
 						const updateContactV2Response = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 							method: 'PATCH',
-							url: `${API_ROOT_URL}/v2/contacts/${updateV2Id}`,
+							url: `${V2_API_URL}/contacts/${updateV2Id}`,
 							headers: { 'Content-Type': 'application/json' },
 							body: updateContactV2Data,
 						});
@@ -1563,7 +1564,7 @@ export class Telli implements INodeType {
 						const deleteContactV2Id = this.getNodeParameter('resourceId', i) as string;
 						const deleteContactV2Response = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 							method: 'DELETE',
-							url: `${API_ROOT_URL}/v2/contacts/${deleteContactV2Id}`,
+							url: `${V2_API_URL}/contacts/${deleteContactV2Id}`,
 							headers: { 'Content-Type': 'text/plain' },
 						});
 						outputData.push({ json: deleteContactV2Response });
@@ -1587,7 +1588,7 @@ export class Telli implements INodeType {
 
 								const listContactsResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 									method: 'GET',
-									url: `${API_ROOT_URL}/v2/contacts`,
+									url: `${V2_API_URL}/contacts`,
 									headers: { 'Content-Type': 'application/json' },
 									qs: contactsQs,
 								}) as IDataObject;
@@ -1609,7 +1610,7 @@ export class Telli implements INodeType {
 
 							const listContactsResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 								method: 'GET',
-								url: `${API_ROOT_URL}/v2/contacts`,
+								url: `${V2_API_URL}/contacts`,
 								headers: { 'Content-Type': 'application/json' },
 								qs: contactsQs,
 							});
@@ -1623,7 +1624,7 @@ export class Telli implements INodeType {
 						const getContactV2Id = this.getNodeParameter('resourceId', i) as string;
 						const getContactV2Response = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 							method: 'GET',
-							url: `${API_ROOT_URL}/v2/contacts/${getContactV2Id}`,
+							url: `${V2_API_URL}/contacts/${getContactV2Id}`,
 							headers: { 'Content-Type': 'application/json' },
 						});
 						outputData.push({ json: getContactV2Response });
@@ -1634,7 +1635,7 @@ export class Telli implements INodeType {
 						const externalIdV2 = this.getNodeParameter('v2ExternalId', i) as string;
 						const getContactByExternalIdV2Response = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 							method: 'GET',
-							url: `${API_ROOT_URL}/v2/external/contacts/${externalIdV2}`,
+							url: `${V2_API_URL}/external/contacts/${externalIdV2}`,
 							headers: { 'Content-Type': 'application/json' },
 						});
 						outputData.push({ json: getContactByExternalIdV2Response });
@@ -1658,7 +1659,7 @@ export class Telli implements INodeType {
 
 								const listAgentsResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 									method: 'GET',
-									url: `${API_ROOT_URL}/v2/agents`,
+									url: `${V2_API_URL}/agents`,
 									headers: { 'Content-Type': 'application/json' },
 									qs: agentsQs,
 								}) as IDataObject;
@@ -1680,7 +1681,7 @@ export class Telli implements INodeType {
 
 							const listAgentsResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 								method: 'GET',
-								url: `${API_ROOT_URL}/v2/agents`,
+								url: `${V2_API_URL}/agents`,
 								headers: { 'Content-Type': 'application/json' },
 								qs: agentsQs,
 							});
@@ -1694,7 +1695,7 @@ export class Telli implements INodeType {
 						const getAgentId = this.getNodeParameter('agentResourceId', i) as string;
 						const getAgentResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 							method: 'GET',
-							url: `${API_ROOT_URL}/v2/agents/${getAgentId}`,
+							url: `${V2_API_URL}/agents/${getAgentId}`,
 							headers: { 'Content-Type': 'application/json' },
 						});
 						outputData.push({ json: getAgentResponse });
@@ -1705,7 +1706,7 @@ export class Telli implements INodeType {
 						const callId = this.getNodeParameter('resourceId', i) as string;
 						const getCallResponseV1 = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 							method: 'GET',
-							url: `${BASE_API_URL}/get-call/${callId}`,
+							url: `${V1_API_URL}/get-call/${callId}`,
 						});
 						outputData.push({ json: getCallResponseV1 });
 						break;
@@ -1723,7 +1724,7 @@ export class Telli implements INodeType {
 						if (callMaxRetryDaysV1 > 0) initiateCallPayload.max_retry_days = callMaxRetryDaysV1;
 						const initiateCallResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 							method: 'POST',
-							url: `${BASE_API_URL}/initiate-call`,
+							url: `${V1_API_URL}/initiate-call`,
 							headers: { 'Content-Type': 'application/json' },
 							body: initiateCallPayload,
 						});
@@ -1735,7 +1736,7 @@ export class Telli implements INodeType {
 						const scheduleCalls = parseJsonInput(this.getNodeParameter('scheduleCallsBatch', i, '[]'));
 						const scheduleCallsBatchResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 							method: 'POST',
-							url: `${BASE_API_URL}/schedule-calls-batch`,
+							url: `${V1_API_URL}/schedule-calls-batch`,
 							headers: { 'Content-Type': 'application/json' },
 							body: { contacts: scheduleCalls },
 						});
@@ -1746,7 +1747,7 @@ export class Telli implements INodeType {
 					case 'list-contact-properties-v2': {
 						const listContactPropertiesResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 							method: 'GET',
-							url: `${API_ROOT_URL}/v2/properties/contacts`,
+							url: `${V2_API_URL}/properties/contacts`,
 							headers: { 'Content-Type': 'application/json' },
 						});
 						outputData.push({ json: listContactPropertiesResponse });
@@ -1757,7 +1758,7 @@ export class Telli implements INodeType {
 						const getPropertyKey = this.getNodeParameter('contactPropertyKey', i) as string;
 						const getContactPropertyResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 							method: 'GET',
-							url: `${API_ROOT_URL}/v2/properties/contacts/${getPropertyKey}`,
+							url: `${V2_API_URL}/properties/contacts/${getPropertyKey}`,
 							headers: { 'Content-Type': 'application/json' },
 						});
 						outputData.push({ json: getContactPropertyResponse });
@@ -1803,7 +1804,7 @@ export class Telli implements INodeType {
 
 						const createContactPropertyResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 							method: 'POST',
-							url: `${API_ROOT_URL}/v2/properties/contacts`,
+							url: `${V2_API_URL}/properties/contacts`,
 							headers: { 'Content-Type': 'application/json' },
 							body: createPropertyPayload,
 						});
@@ -1845,7 +1846,7 @@ export class Telli implements INodeType {
 
 						const updateContactPropertyResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 							method: 'PATCH',
-							url: `${API_ROOT_URL}/v2/properties/contacts/${updatePropertyKey}`,
+							url: `${V2_API_URL}/properties/contacts/${updatePropertyKey}`,
 							headers: { 'Content-Type': 'application/json' },
 							body: updatePropertyPayload,
 						});
@@ -1856,7 +1857,7 @@ export class Telli implements INodeType {
 					case 'list-phone-numbers-v1': {
 						const listPhoneNumbersResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 							method: 'GET',
-							url: `${BASE_API_URL}/phone-numbers`,
+							url: `${V1_API_URL}/phone-numbers`,
 						});
 						outputData.push({ json: listPhoneNumbersResponse });
 						break;
@@ -1866,7 +1867,7 @@ export class Telli implements INodeType {
 						const replacePhoneNumberId = this.getNodeParameter('resourceId', i) as string;
 						const replacePhoneNumberResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 							method: 'POST',
-							url: `${BASE_API_URL}/phone-numbers/${replacePhoneNumberId}/replace`,
+							url: `${V1_API_URL}/phone-numbers/${replacePhoneNumberId}/replace`,
 							headers: { 'Content-Type': 'application/json' },
 							body: {},
 						});
@@ -1883,7 +1884,7 @@ export class Telli implements INodeType {
 						};
 						const importPhoneNumberResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 							method: 'POST',
-							url: `${BASE_API_URL}/phone-numbers/import`,
+							url: `${V1_API_URL}/phone-numbers/import`,
 							headers: { 'Content-Type': 'application/json' },
 							body: importPhoneNumberPayload,
 						});
@@ -1895,7 +1896,7 @@ export class Telli implements INodeType {
 						const deletePhoneNumberId = this.getNodeParameter('resourceId', i) as string;
 						const deletePhoneNumberResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 							method: 'DELETE',
-							url: `${BASE_API_URL}/phone-numbers/${deletePhoneNumberId}`,
+							url: `${V1_API_URL}/phone-numbers/${deletePhoneNumberId}`,
 							headers: { 'Content-Type': 'text/plain' },
 						});
 						outputData.push({ json: deletePhoneNumberResponse });
@@ -1906,7 +1907,7 @@ export class Telli implements INodeType {
 						const removeBatchIds = parseJsonInput(this.getNodeParameter('contactIdsBatch', i, '[]'));
 						const removeBatchResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 							method: 'POST',
-							url: `${BASE_API_URL}/remove-from-auto-dialer-batch`,
+							url: `${V1_API_URL}/remove-from-auto-dialer-batch`,
 							headers: { 'Content-Type': 'application/json' },
 							body: { contact_ids: removeBatchIds },
 						});
@@ -1918,7 +1919,7 @@ export class Telli implements INodeType {
 						const addContactsBatch = parseJsonInput(this.getNodeParameter('contactsBatch', i, '[]'));
 						const addContactsBatchResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 							method: 'POST',
-							url: `${BASE_API_URL}/add-contacts-batch`,
+							url: `${V1_API_URL}/add-contacts-batch`,
 							headers: { 'Content-Type': 'application/json' },
 							body: { contacts: addContactsBatch },
 						});
@@ -1930,7 +1931,7 @@ export class Telli implements INodeType {
 						const updateContactsBatch = parseJsonInput(this.getNodeParameter('contactsBatch', i, '[]'));
 						const updateContactsBatchResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 							method: 'PATCH',
-							url: `${BASE_API_URL}/update-contacts-batch`,
+							url: `${V1_API_URL}/update-contacts-batch`,
 							headers: { 'Content-Type': 'application/json' },
 							body: { contacts: updateContactsBatch },
 						});
@@ -1942,7 +1943,7 @@ export class Telli implements INodeType {
 						const getContactIdV1 = this.getNodeParameter('deprecatedContactId', i) as string;
 						const getContactV1Response = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 							method: 'GET',
-							url: `${BASE_API_URL}/get-contact/${getContactIdV1}`,
+							url: `${V1_API_URL}/get-contact/${getContactIdV1}`,
 						});
 						outputData.push({ json: getContactV1Response });
 						break;
@@ -1953,7 +1954,7 @@ export class Telli implements INodeType {
 						const getContactsBatchLimit = this.getNodeParameter('batchLimit', i, 10) as number;
 						const getContactsBatchResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'telliApi', {
 							method: 'POST',
-							url: `${BASE_API_URL}/get-contacts-batch`,
+							url: `${V1_API_URL}/get-contacts-batch`,
 							headers: { 'Content-Type': 'application/json' },
 							body: { contact_ids: getContactsBatchIds },
 						});
