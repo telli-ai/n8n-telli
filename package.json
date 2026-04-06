@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-telli",
-  "version": "1.1.0",
+  "version": "1.1.1-beta.7",
   "description": "n8n community node which lets you use the telli AI phone calling platform in your n8n workflows",
   "keywords": [
     "n8n-community-node-package"
@@ -28,7 +28,8 @@
     "prepublishOnly": "npm run build && npm run lint -c .eslintrc.prepublish.js nodes credentials package.json",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "test:api": "jest test/api --runInBand"
   },
   "files": [
     "dist/**/*",
@@ -64,5 +65,10 @@
   },
   "peerDependencies": {
     "n8n-workflow": "*"
+  },
+  "jest": {
+    "modulePathIgnorePatterns": [
+      "<rootDir>/dist/"
+    ]
   }
 }

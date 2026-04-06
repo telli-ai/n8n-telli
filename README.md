@@ -21,10 +21,8 @@ telli is an AI phone calling platform that lets you automate phone call operatio
 
 - `nodes/`: Contains the actual node implementations
   - `Telli/`: The telli node folder
-    - `Telli.node.ts`: Main implementation of the telli node with operations for adding contacts and scheduling calls
+    - `Telli.node.ts`: Main implementation of the telli node with all operations
     - `telli.svg`: Icon for the node in n8n
-
-<!-- Adding a node would mean creating a new folder in the nodes/ directory, and adding a new file with the node implementation. -->
 
 - `dist/`: Generated folder containing compiled JavaScript code (created after running `npm run build`)
 
@@ -62,30 +60,68 @@ npm install n8n-nodes-telli
 
 ## Actions
 
-The telli node provides the following operations:
+The telli node provides the following operations, grouped by resource:
 
-### Add Contact
-- Add a new contact to telli with first name, last name, email, phone number, and optional attributes
-- See more info [here](https://docs.telli.com/endpoint/add-contact)
+### Contact
 
-### Update Contact
-- Update an existing contact in telli. Only provided fields will be updated, others remain unchanged
-- Supports updating first name, last name, phone number, email, external contact ID, external URL, salutation, timezone, and contact details
-- See more info [here](https://docs.telli.com/endpoint/update-contact)
+| Operation | Description | API Docs |
+| --- | --- | --- |
+| Create Contact | Create a new contact with name, phone number, email, and custom properties | [Docs](https://docs.telli.com/v2/endpoint/create-contact) |
+| Get Contact | Retrieve a contact by ID | [Docs](https://docs.telli.com/v2/endpoint/get-contact) |
+| Get Contact by External ID | Retrieve a contact using your external system's ID | [Docs](https://docs.telli.com/v2/endpoint/get-contact-by-external-id) |
+| List Contacts | List contacts with pagination and optional "Return All" toggle | [Docs](https://docs.telli.com/v2/endpoint/list-contacts) |
+| Update Contact | Update an existing contact. Only provided fields are changed | [Docs](https://docs.telli.com/v2/endpoint/update-contact) |
+| Delete Contact | Soft-delete a contact and anonymize all PII data | [Docs](https://docs.telli.com/v2/endpoint/delete-contact) |
 
-### Delete Contact
-- Permanently delete a contact and any PII data associated with it from the system
-- This action cannot be undone. If you want to stop calling a contact, use the `v1/remove-from-auto-dialer` endpoint instead
-- See more info [here](https://docs.telli.com/endpoint/delete-contact)
+### Agent
 
-### Remove from Auto Dialer
-- Remove a contact from the auto dialer queue
-- This stops the contact from receiving automated calls without deleting their data
-- See more info [here](https://docs.telli.com/endpoint/remove-from-auto-dialer)
+| Operation | Description | API Docs |
+| --- | --- | --- |
+| Get Agent | Retrieve an agent by selecting from a dropdown or specifying an ID | [Docs](https://docs.telli.com/v2/endpoint/get-agent) |
+| List Agents | List agents with pagination and optional "Return All" toggle | [Docs](https://docs.telli.com/v2/endpoint/list-agents) |
 
-### Schedule Call
-- Schedule an AI phone call with a telli contact, with customizable message and questions
-- See more info [here](https://docs.telli.com/endpoint/schedule-call)
+### Call
+
+| Operation | Description | API Docs |
+| --- | --- | --- |
+| Schedule Call | Schedule an AI phone call at the earliest opportunity within the dialer window | [Docs](https://docs.telli.com/endpoint/schedule-call) |
+| Schedule Calls (Batch) | Schedule multiple calls in one request (max 50 per request) | [Docs](https://docs.telli.com/endpoint/schedule-calls-batch) |
+| Get Call | Retrieve call details including transcript and analysis by call ID | [Docs](https://docs.telli.com/endpoint/get-call) |
+| Initiate Call | Immediately initiate an outbound call (not recommended — prefer Schedule Call) | [Docs](https://docs.telli.com/endpoint/initiate-call) |
+| Remove From Auto Dialer | Remove a contact from the auto dialer queue | [Docs](https://docs.telli.com/endpoint/remove-from-dialer) |
+| Remove From Auto Dialer (Batch) | Remove multiple contacts from the auto dialer queue (max 50 per request) | [Docs](https://docs.telli.com/endpoint/remove-from-dialer-batch) |
+
+### Contact Property
+
+| Operation | Description | API Docs |
+| --- | --- | --- |
+| Create Contact Property | Define a new custom property for contacts (text, number, select, etc.) | [Docs](https://docs.telli.com/v2/endpoint/create-contact-property) |
+| Get Contact Property | Retrieve a contact property by key | [Docs](https://docs.telli.com/v2/endpoint/get-contact-property) |
+| List Contact Properties | List all contact properties for the account | [Docs](https://docs.telli.com/v2/endpoint/list-contact-properties) |
+| Update Contact Property | Update an existing contact property's label, description, or options | [Docs](https://docs.telli.com/v2/endpoint/update-contact-property) |
+
+### Phone Number
+
+| Operation | Description | API Docs |
+| --- | --- | --- |
+| List Phone Numbers | List all active phone numbers for the account | [Docs](https://docs.telli.com/endpoint/list-phone-numbers) |
+| Import Phone Number | Import a phone number from your own SIP trunk provider | [Docs](https://docs.telli.com/endpoint/import-phone-number) |
+| Replace Phone Number | Replace a phone number with a new one (old number stays active for callbacks for 30 days) | [Docs](https://docs.telli.com/endpoint/replace-phone-number) |
+| Delete Phone Number | Schedule a phone number for deletion (stays active for callbacks for 30 days) | [Docs](https://docs.telli.com/endpoint/delete-phone-number) |
+
+### Deprecated (v1)
+
+These operations use the legacy v1 API and are kept for backward compatibility with existing workflows. Use the Contact resource above for new workflows.
+
+| Operation | Description | API Docs |
+| --- | --- | --- |
+| Add Contact | Add a contact using the v1 endpoint | [Docs](https://docs.telli.com/endpoint/add-contact) |
+| Add Contacts (Batch) | Add multiple contacts using the v1 batch endpoint | [Docs](https://docs.telli.com/endpoint/add-contacts-batch) |
+| Get Contact | Get a contact by ID using the v1 endpoint | [Docs](https://docs.telli.com/endpoint/get-contact) |
+| Get Contact by External ID | Get a contact by external ID using the v1 endpoint | [Docs](https://docs.telli.com/endpoint/get-contact-by-external-id) |
+| Get Contacts (Batch) | Get multiple contacts using the v1 batch endpoint | [Docs](https://docs.telli.com/endpoint/get-contacts-batch) |
+| Update Contact | Update a contact using the v1 endpoint | [Docs](https://docs.telli.com/endpoint/update-contact) |
+| Update Contacts (Batch) | Update multiple contacts using the v1 batch endpoint | [Docs](https://docs.telli.com/endpoint/update-contacts-batch) |
 
 ## Credentials
 
@@ -102,45 +138,48 @@ This node has been tested with n8n version 0.171.0 and higher.
 
 ## Usage
 
-### Add Contact Example
+### Create Contact Example
 
 1. Add the telli node to your workflow
-2. Select the "Add Contact" operation
-3. Fill in the required fields (First Name, Last Name, Phone Number, External Contact ID)
-4. Optionally add Email, Salutation, etc.
-5. Connect the node to a trigger or another node
+2. Select the **Contact** resource and **Create Contact** operation
+3. Fill in the required fields (First Name, Last Name, Phone Number)
+4. Optionally add email, external ID, salutation, timezone, and custom properties
+5. Properties can be added using the field editor or as a JSON array: `[{"key": "company", "value": "Acme"}]`
 
-### Update Contact Example
+### Schedule Call Example
 
 1. Add the telli node to your workflow
-2. Select the "Update Contact" operation
-3. Enter the Contact ID (obtained from a previous Add Contact operation or from telli dashboard)
-4. Fill in only the fields you want to update (leave others empty to keep existing values)
-5. Connect the node to a trigger or another node
+2. Select the **Call** resource and **Schedule Call** operation
+3. Enter the Contact ID and select an Agent from the dropdown
+4. Optionally set max retry days and override the from number
+5. The call will be scheduled at the earliest opportunity within the agent's dialer window
+
+### List Contacts with Pagination
+
+1. Add the telli node to your workflow
+2. Select the **Contact** resource and **List Contacts** operation
+3. Toggle **Return All** to fetch every contact, or set a **Limit** for a single page
+
+### Manage Contact Properties
+
+1. Add the telli node to your workflow
+2. Select the **Contact Property** resource
+3. Use **Create Contact Property** to define new fields (e.g., a "Company" text field or a "Status" select field)
+4. For `select` and `multi_select` types, add options using the field editor or as JSON: `[{"value": "a", "label": "Option A"}]`
 
 ### Delete Contact Example
 
 1. Add the telli node to your workflow
-2. Select the "Delete Contact" operation
-3. Enter the Contact ID (obtained from a previous Add Contact operation or from telli dashboard)
-4. Connect the node to a trigger or another node
-5. **Warning**: This action permanently deletes the contact and cannot be undone
+2. Select the **Contact** resource and **Delete Contact** operation
+3. Enter the Contact ID
+4. **Warning**: This soft-deletes the contact and anonymizes all PII data
 
 ### Remove from Auto Dialer Example
 
 1. Add the telli node to your workflow
-2. Select the "Remove from Auto Dialer" operation
-3. Enter the Contact ID (obtained from a previous Add Contact operation or from telli dashboard)
-4. Connect the node to a trigger or another node
-5. This will stop the contact from receiving automated calls without deleting their data
-
-### Schedule Call Example
-
-1. Add the telli node to your workflow  
-2. Select the "Schedule Call" operation
-3. Enter the Contact ID (obtained from a previous Add Contact operation or from telli dashboard)
-4. Configure call details including message and questions
-5. Connect to a trigger or other nodes to start the workflow
+2. Select the **Call** resource and **Remove From Auto Dialer** operation
+3. Enter the Contact ID
+4. This stops the contact from receiving automated calls without deleting their data
 
 ## Resources
 
